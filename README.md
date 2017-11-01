@@ -1,5 +1,3 @@
-#### INSTALLATION
-
 A Simple Dash Application to examine CMIP5 Downscaled climate model outputs over
 the Northwest Territories, Canada. 
 
@@ -7,7 +5,8 @@ All work is funded through SNAP at the University of Alaska Fairbanks.
 
 __App is currently hosted [here](https://nwt-dash-app.herokuapp.com/).__
 
-To run the application locally, follow these steps.  Not tested on Windows.
+To run the application locally, follow the shell commands below.  Not tested on Windows.
+
 ```bash
 
 # make a virtualenv

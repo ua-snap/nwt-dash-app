@@ -144,12 +144,12 @@ app.layout = html.Div([
                                         values=['rcp85'],
                                         labelStyle={'display': 'inline-block'}
                                     )], className='four columns'),
-                            html.Div( [ html.Label('Choose Month', style={'font-weight':'bold'}),
+                            html.Div( [ html.Label('Choose Month(s)', style={'font-weight':'bold'}),
                                         dcc.Dropdown(
                                             id='month-dropdown',
                                             options=[ {'label':i, 'value':i} for i in range(1, 12+1) ],
-                                            value=1,
-                                            multi=False ) ], id='month-div', className='four columns')
+                                            value=[1],
+                                            multi=True ) ], id='month-div', className='four columns')
                             ], className='row'),
 
                         html.Label('Choose Model(s)', style={'font-weight':'bold'}),
@@ -249,7 +249,7 @@ def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_
     
     # months
     if selected_tab_value == 2:
-        dff = dff.loc[ dff[ 'month' ].isin( [months] ), ]
+        dff = dff.loc[ dff[ 'month' ].isin( months ), ]
 
         if len(dff.month.unique()) > 1:
             print( 'ISSUE!' )

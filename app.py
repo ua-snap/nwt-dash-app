@@ -17,8 +17,20 @@ files = [ 'tas_minesites_decadal_annual_mean_alldata_melted.csv',
 
 files = [ os.path.join( '.','data',fn ) for fn in files ]
 data = { count+1:pd.read_csv(fn, index_col=0) for count, fn in enumerate( files ) }
-# make sure we only have the years with full decades...
-data = { k:v[(v['year'] >= 2010) & (v['year'] <= 2290)] for k,v in data.items() }
+# make sure we only have the years with full decades... this is kinda tricky...
+filtered_data = dict()
+for k,v in data.items():
+    out = []
+    for i,df in v.groupby(['model','scenario']):
+        if df['year'].max() > 2100:
+            out.append( df[df['year'] <= 2290 ] )
+        else:
+            out.append( df[df['year'] <= 2090 ] )
+        filtered_data[k] = pd.concat( out )
+
+del df, data
+# welcome to the wild west folks!!! :(
+data = filtered_data # ugly
 df = data[1] # hacky --> use this to build out some stuff in the layout...
 
 pts = pd.read_csv( './data/minesites.csv', index_col=0 )
@@ -166,6 +178,10 @@ app.layout = html.Div([
         html.Div(id='intermediate-value', style={'display': 'none'}),
         ])
 
+# cleanup
+del df 
+df = None
+
 # # INTERACTIVITY 
 @app.callback( Output('month-div', 'style'), [Input('tabs','value')] )
 def update_month_div( selected_tab_value ):
@@ -222,6 +238,8 @@ def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_
     print( 'prepping data' )
 
     cur_df = data[ selected_tab_value ].copy()
+    if 'group' in cur_df.columns:
+        cur_df = cur_df.drop( 'group', axis=1 )
     begin_range, end_range = year_range
     dff = cur_df[ (cur_df.minesite == minesite) & (cur_df['year'] >= begin_range) & (cur_df['year'] <= end_range) ].copy()
     # dff = dff[ (dff['year'] >= begin_range) & (dff['year'] <= end_range) ]
@@ -233,6 +251,7 @@ def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_
         dff = dff.loc[ dff[ 'month' ].isin( [months] ), ]
 
         if len(dff.month.unique()) > 1:
+            print( 'ISSUE!' )
             dff = pd.concat([ average_months( dff, m, s ) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique()) ], axis=0)
 
     dff = dff.reset_index(drop=True)

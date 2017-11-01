@@ -11,11 +11,6 @@ import numpy as np
 # #  NWT -- ANNUAL / MONTHLY DECADAL TEMPERATURE AVERAGES application   # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-app = dash.Dash(__name__)
-server = app.server
-app.config.supress_callback_exceptions = True
-app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
-
 # # APP INPUT DATA
 files = [ 'tas_minesites_decadal_annual_mean_alldata_melted.csv',
          'tas_minesites_decadal_monthly_mean_alldata_melted.csv' ]
@@ -23,7 +18,7 @@ files = [ 'tas_minesites_decadal_annual_mean_alldata_melted.csv',
 files = [ os.path.join( '.','data',fn ) for fn in files ]
 data = { count+1:pd.read_csv(fn, index_col=0) for count, fn in enumerate( files ) }
 # make sure we only have the years with full decades...
-data = { k:v[(v['year'] > 2000) & (v['year'] < 2100)] for k,v in data.items() }
+data = { k:v[(v['year'] >= 2010) & (v['year'] <= 2290)] for k,v in data.items() }
 df = data[1] # hacky --> use this to build out some stuff in the layout...
 
 pts = pd.read_csv( './data/minesites.csv', index_col=0 )
@@ -102,6 +97,11 @@ for similar colors being used for different model-scenario groups.__
 
 
 '''
+
+app = dash.Dash(__name__)
+server = app.server
+app.config.supress_callback_exceptions = True
+app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
 # # BUILD PAGE LAYOUT
 app.layout = html.Div([ 

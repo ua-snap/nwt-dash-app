@@ -112,6 +112,7 @@ for similar colors being used for different model-scenario groups.__
 
 app = dash.Dash(__name__)
 server = app.server
+server.secret_key = 'I-AM-SECRET'
 app.config.supress_callback_exceptions = True
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
@@ -161,7 +162,7 @@ app.layout = html.Div([
                         dcc.Graph( id='my-graph' ),
                         html.Div([
                             dcc.RangeSlider( id='range-slider',
-                                marks={str(year): str(year) for year in df['year'].unique()},
+                                marks={str(year): str(year) for year in df['year'].unique()[::2]},
                                 min=df['year'].min(),
                                 max=df['year'].max(),
                                 step=1,

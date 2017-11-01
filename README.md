@@ -22,9 +22,10 @@ pip install dash-renderer==0.11.0
 pip install dash-html-components==0.8.0
 pip install dash-core-components==0.13.0
 pip install plotly --upgrade
+pip install gunicorn
 
 # run most up-to-date version of the application
-python nwt-app.py
+python app.py
 
 # navigate to http://127.0.0.1:8050/
 

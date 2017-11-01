@@ -12,9 +12,9 @@ import numpy as np
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 app = dash.Dash(__name__)
+server = app.server
 app.config.supress_callback_exceptions = True
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
-server = app.server
 
 # # APP INPUT DATA
 files = [ 'tas_minesites_decadal_annual_mean_alldata_melted.csv',

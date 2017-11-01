@@ -11,6 +11,11 @@ import numpy as np
 # #  NWT -- ANNUAL / MONTHLY DECADAL TEMPERATURE AVERAGES application   # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+app = dash.Dash(__name__)
+app.config.supress_callback_exceptions = True
+app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
+server = app.server
+
 # # APP INPUT DATA
 files = [ 'tas_minesites_decadal_annual_mean_alldata_melted.csv',
          'tas_minesites_decadal_monthly_mean_alldata_melted.csv' ]
@@ -97,10 +102,6 @@ for similar colors being used for different model-scenario groups.__
 
 
 '''
-
-app = dash.Dash()
-app.config.supress_callback_exceptions = True
-app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
 # # BUILD PAGE LAYOUT
 app.layout = html.Div([ 

@@ -88,26 +88,13 @@ ms_colors = {'GISS-E2-R':{'rcp45':'#FDD017','rcp60':'#F2BB66','rcp85':'#EAC117'}
 
 
 markdown_map = '''
-#### How to use this application:
-- Click minesite points in the map above 
-to select a different mine to display
-in the plot to the left.
-- select single or multiple emissions scenarios 
-which will update the line graph with the desired 
-traces.
-- select single or multiple models from the dropdown
-menu to display different models.
-- Use the range slider below the line graph to select 
-the range of decades to be viewed.
-- the line graphic is interactive and a toolbar will display
-in the upper-right corner of the graphic upon hover, which 
-provides some tools that can be used to customize the users view.
-
-__NOTE: Putting too many combinations of models and scenarios
-will generate a very busy graphic and there is a larger chance
-for similar colors being used for different model-scenario groups.__
-
-
+__How to use this application:__
+- select combinations of model(s)/scenario(s)/year-ranges for a 
+mine site and display plots.
+- mine can also be selected from the map above.
+- toggle between annual/monthly outputs with tabs. if multiple months are chosen, they are averaged.
+- plot is interactive and addt'l toolbars display on hover.
+- __[ note ]: too many combinations of models/scenarios generates a busy graphic.__
 '''
 
 app = dash.Dash(__name__)
@@ -118,14 +105,14 @@ app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 
 # # BUILD PAGE LAYOUT
 app.layout = html.Div([ 
-                dcc.Markdown( id='mdown-head' ),
+                html.Div([html.H4('NWT Climate Scenarios Explorer -- Mining')],id='mdown-head'),
                 html.Div([ 
                     html.Div([
                         dcc.Tabs( 
                             id='tabs',
                             tabs=[
-                                {'label': 'Annual Decadal Temperatures', 'value': 1},
-                                {'label': 'Monthly Decadal Temperatures', 'value': 2},
+                                {'label': 'Annual Decadal Mean Temperatures', 'value': 1},
+                                {'label': 'Monthly Decadal Mean Temperatures', 'value': 2},
                             ],
                             value=1,
                             vertical=False
@@ -200,17 +187,6 @@ def update_minesite_radio( clickdata ):
     else:
         return 'Prairie_Creek_Mine'
 
-@app.callback( Output('mdown-head','children'), [Input('tabs','value')] )
-def update_header( selected_tab_value ):
-    if selected_tab_value == 1:
-        return ''' 
-        ## Northwest Territories Mine Sites -- Decadal Mean Annual Temperature
-        '''
-    elif selected_tab_value == 2:
-        return ''' 
-        ### Northwest Territories Mine Sites -- Decadal Mean Monthly Temperature
-        '''
-
 def average_months( dff, model, scenario ):
     ''' 
     in case of multiple months allowed to be chosen
@@ -225,7 +201,6 @@ def average_months( dff, model, scenario ):
     dfm['scenario'] = scenario
     dfm['month'] = '_'.join(['avg'] + [ str(m) for m in dff.month.unique() ])
     return dfm
-
 
 @app.callback( Output('intermediate-value', 'children'), 
                 [Input('tabs', 'value'),

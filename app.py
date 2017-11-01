@@ -40,6 +40,7 @@ scenarios = ['rcp45','rcp60','rcp85']
 
 # # CONFIGURE MAPBOX AND DATA OVERLAYS
 ptsd = list(pts.T.to_dict().values())
+del pts # cleanup
 # MINE_ORDER_REFERENCE = ['CanTung Mine', 'Diavik Mine', 'Ekati Mine', 'Gahcho Kue Mine', 
 #                            'NICO Mine', 'Pine Point Mine (Tamerlane)', 'Prairie Creek Mine', 'Snap Lake Mine'] 
 
@@ -77,7 +78,6 @@ map_layout = go.Layout(
 
 map_figure = go.Figure( dict(data=map_traces, layout=map_layout) )
 
-
 # LINE COLORS LOOKUP -- hacky but somewhat working
 ms_colors = {'GISS-E2-R':{'rcp45':'#FDD017','rcp60':'#F2BB66','rcp85':'#EAC117'},
             'GFDL-CM3':{'rcp45':'#6AA121','rcp60':'#347C17','rcp85':'#254117'},
@@ -99,7 +99,7 @@ mine site and display plots.
 
 app = dash.Dash(__name__)
 server = app.server
-server.secret_key = 'I-AM-SECRET'
+server.secret_key = 'SECRET-SNAP-KEY'
 app.config.supress_callback_exceptions = True
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 
@@ -181,7 +181,6 @@ def update_month_div( selected_tab_value ):
 
 @app.callback( Output('minesites-dropdown', 'value'), [Input('minesites-map', 'clickData')])
 def update_minesite_radio( clickdata ):
-    print( clickdata )
     if clickdata is not None: # make it draw the inital graph before a clickevent
         return clickdata['points'][0]['text'].replace(' ', '_')
     else:
@@ -192,6 +191,7 @@ def average_months( dff, model, scenario ):
     in case of multiple months allowed to be chosen
     average all of the months together to single traces.
     '''
+    print('averaging months')
     sub_df = dff[(dff['model'] == model) & (dff['scenario'] == scenario)]
     dfm = sub_df.groupby( 'month' ).apply(lambda x: x['tas'].reset_index(drop=True)).T.mean(axis=1).copy()
     # convert back to a DataFrame from the output Series...
@@ -218,7 +218,6 @@ def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_
         cur_df = cur_df.drop( 'group', axis=1 )
     begin_range, end_range = year_range
     dff = cur_df[ (cur_df.minesite == minesite) & (cur_df['year'] >= begin_range) & (cur_df['year'] <= end_range) ].copy()
-    # dff = dff[ (dff['year'] >= begin_range) & (dff['year'] <= end_range) ]
     dff = dff.loc[ dff[ 'scenario' ].isin( scenario_values ), ]
     dff = dff.loc[ dff[ 'model' ].isin( model_values ), ]
     
@@ -227,11 +226,9 @@ def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_
         dff = dff.loc[ dff[ 'month' ].isin( months ), ]
 
         if len(dff.month.unique()) > 1:
-            print( 'ISSUE!' )
             dff = pd.concat([ average_months( dff, m, s ) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique()) ], axis=0)
 
     dff = dff.reset_index(drop=True)
-    print(dff.to_json())
     return dff.to_json()
 
 @app.callback( Output('my-graph', 'figure'), [Input('intermediate-value', 'children')] )

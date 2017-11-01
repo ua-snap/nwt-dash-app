@@ -236,6 +236,7 @@ def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_
             dff = pd.concat([ average_months( dff, m, s ) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique()) ], axis=0)
 
     dff = dff.reset_index(drop=True)
+    print(dff.to_json())
     return dff.to_json()
 
 @app.callback( Output('my-graph', 'figure'), [Input('intermediate-value', 'children')] )

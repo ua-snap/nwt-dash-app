@@ -154,7 +154,7 @@ app.layout = html.Div([
                                             labelStyle={'display': 'inline-block'} ),
                                         dcc.Dropdown(
                                             id='month-dropdown',
-                                            options=[ {'label':i, 'value':i} for i in list(range(1, 12+1)) + ['all'] ],
+                                            options=[ {'label':i, 'value':i} for i in list(range(1, 12+1)) ],
                                             value=[1],
                                             multi=True,
                                             disabled=False ) ], id='month-div', className='four columns')

@@ -115,7 +115,7 @@ app.layout = html.Div([
                 html.Div([
                     html.Div([
                             html.H4('NWT Climate Scenarios Explorer'),
-                            html.H5('Decadal Monthly Mean Temperatures'),
+                            dcc.Markdown(children='Decadal Monthly Mean Temperatures'),
                             html.Img(src='data:image/gif;base64,{}'.format(encoded_images[0])),
                             html.Img(src='data:image/png;base64,{}'.format(encoded_images)[1])
                         ],id='mdown-head', className='row'),

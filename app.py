@@ -6,14 +6,15 @@ import plotly.graph_objs as go
 import pandas as pd
 import geopandas as gpd
 import numpy as np
+import base64
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # #  NWT -- ANNUAL / MONTHLY DECADAL TEMPERATURE AVERAGES application   # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # # APP INPUT DATA
-files = [ 'tas_minesites_decadal_annual_mean_alldata_melted.csv',
-         'tas_minesites_decadal_monthly_mean_alldata_melted.csv' ]
+files = [ 'tas_minesites_decadal_monthly_mean_alldata_melted.csv', 
+            'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv' ]
 
 files = [ os.path.join( '.','data',fn ) for fn in files ]
 data = { count+1:pd.read_csv(fn, index_col=0) for count, fn in enumerate( files ) }
@@ -29,6 +30,11 @@ for k,v in data.items():
         filtered_data[k] = pd.concat( out )
 
 del df, data
+
+# LAYOUT STATIC IMAGES:
+static_files = ['./images/Northwest_Territories.gif','./images/snap_color.png']
+encoded_images = [base64.b64encode(open(image_filename, 'rb').read()) for image_filename in static_files]
+
 # welcome to the wild west folks!!! :(
 data = filtered_data # ugly
 df = data[1] # hacky --> use this to build out some stuff in the layout...
@@ -59,8 +65,8 @@ mapbox_config = dict(accesstoken=mapbox_access_token,
                         bearing=0,
                         pitch=0,
                         zoom=3,
-                        center=dict(lat=65,
-                                    lon=-116),
+                        center=dict(lat=64,
+                                    lon=-116.6),
                         layers=[ dict( sourcetype='geojson',
                                         source=json.loads(open(nwt_shape,'r').read()),
                                         type='fill',
@@ -93,6 +99,7 @@ __How to use this application:__
 mine site and display plots.
 - mine can also be selected from the map above.
 - toggle between annual/monthly outputs with tabs. if multiple months are chosen, they are averaged.
+check 'all months' for annual decadal means.
 - plot is interactive and addt'l toolbars display on hover.
 - __[ note ]: too many combinations of models/scenarios generates a busy graphic.__
 '''
@@ -105,14 +112,19 @@ app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 
 # # BUILD PAGE LAYOUT
 app.layout = html.Div([ 
-                html.Div([html.H4('NWT Climate Scenarios Explorer -- Mining')],id='mdown-head'),
+                html.Div([
+                    html.Div([
+                        html.H4('NWT Climate Scenarios Explorer -- Mining')],id='mdown-head'),
+                        html.Img(src='data:image/gif;base64,{}'.format(encoded_images[0])),
+                        html.Img(src='data:image/png;base64,{}'.format(encoded_images)[1])
+                        ]),
                 html.Div([ 
                     html.Div([
                         dcc.Tabs( 
                             id='tabs',
                             tabs=[
-                                {'label': 'Annual Decadal Mean Temperatures', 'value': 1},
-                                {'label': 'Monthly Decadal Mean Temperatures', 'value': 2},
+                                {'label': 'Decadal Monthly Mean Temperatures -- Mines', 'value': 1},
+                                {'label': 'Decadal Monthly Mean Temperatures -- NWT Province-wide', 'value': 2},
                             ],
                             value=1,
                             vertical=False
@@ -123,7 +135,7 @@ app.layout = html.Div([
                                         options=[ {'label':i.replace('_', ' '), 'value':i} for i in df.minesite.unique() ],
                                         value='Prairie_Creek_Mine',
                                         multi=False,
-                                        )], className='four columns' ),
+                                        )], id='mines-div', className='four columns' ),
 
                             html.Div([ html.Label('Choose Scenario(s)', style={'font-weight':'bold'}),
                                     dcc.Checklist( id='scenario-check',
@@ -131,12 +143,18 @@ app.layout = html.Div([
                                         values=['rcp85'],
                                         labelStyle={'display': 'inline-block'}
                                     )], className='four columns'),
-                            html.Div( [ html.Label('Choose Month(s)', style={'font-weight':'bold'}),
+                            html.Div([ 
+                                        html.Label('Choose Month(s)', style={'font-weight':'bold'}),
+                                        dcc.Checklist(id='all-month-check', 
+                                            options=[{'label':'all months','value':'all'}],
+                                            values=[],
+                                            labelStyle={'display': 'inline-block'} ),
                                         dcc.Dropdown(
                                             id='month-dropdown',
-                                            options=[ {'label':i, 'value':i} for i in range(1, 12+1) ],
+                                            options=[ {'label':i, 'value':i} for i in list(range(1, 12+1)) + ['all'] ],
                                             value=[1],
-                                            multi=True ) ], id='month-div', className='four columns')
+                                            multi=True,
+                                            disabled=False ) ], id='month-div', className='four columns')
                             ], className='row'),
 
                         html.Label('Choose Model(s)', style={'font-weight':'bold'}),
@@ -171,16 +189,18 @@ del df
 df = None
 
 # # INTERACTIVITY 
-@app.callback( Output('month-div', 'style'), [Input('tabs','value')] )
-def update_month_div( selected_tab_value ):
-    print('selected_tab_value={}'.format(selected_tab_value) )
+@app.callback( Output('mines-div', 'style'), [Input('tabs','value')] )
+def update_mines_div( selected_tab_value ):
+    # print('selected_tab_value={}'.format(selected_tab_value) )
     if selected_tab_value == 1:
-        return {'display': 'none'}
-    elif selected_tab_value == 2:
         return None
+    elif selected_tab_value == 2:
+        return {'display': 'none'}
+
 
 @app.callback( Output('minesites-dropdown', 'value'), [Input('minesites-map', 'clickData')])
 def update_minesite_radio( clickdata ):
+    # print(clickdata)
     if clickdata is not None: # make it draw the inital graph before a clickevent
         return clickdata['points'][0]['text'].replace(' ', '_')
     else:
@@ -208,25 +228,34 @@ def average_months( dff, model, scenario ):
                 Input('range-slider', 'value'),
                 Input('scenario-check', 'values'),
                 Input('model-dropdown', 'value'),
-                Input('month-dropdown','value')] )
-def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_values, months ):
+                Input('month-dropdown','value'),
+                Input('all-month-check', 'values')] )
+def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_values, months, all_check ):
     import itertools
     print( 'prepping data' )
 
     cur_df = data[ selected_tab_value ].copy()
     if 'group' in cur_df.columns:
         cur_df = cur_df.drop( 'group', axis=1 )
+   
+    if selected_tab_value == 1:
+        dff = cur_df[ (cur_df.minesite == minesite) ].copy()
+    else:
+        dff = cur_df.copy()
+
     begin_range, end_range = year_range
-    dff = cur_df[ (cur_df.minesite == minesite) & (cur_df['year'] >= begin_range) & (cur_df['year'] <= end_range) ].copy()
+    dff = dff[ (dff['year'] >= begin_range) & (dff['year'] <= end_range) ]
     dff = dff.loc[ dff[ 'scenario' ].isin( scenario_values ), ]
     dff = dff.loc[ dff[ 'model' ].isin( model_values ), ]
     
     # months
-    if selected_tab_value == 2:
-        dff = dff.loc[ dff[ 'month' ].isin( months ), ]
+    if 'all' in all_check:
+        months = list(range(1,12+1))
 
-        if len(dff.month.unique()) > 1:
-            dff = pd.concat([ average_months( dff, m, s ) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique()) ], axis=0)
+    dff = dff.loc[ dff[ 'month' ].isin( months ), ]
+
+    if len(dff.month.unique()) > 1:
+        dff = pd.concat([ average_months( dff, m, s ) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique()) ], axis=0)
 
     dff = dff.reset_index(drop=True)
     return dff.to_json()
@@ -250,6 +279,21 @@ def update_graph( data ):
                                 name=i[0]+' '+i[1], 
                                 line=dict(color=ms_colors[i[0]][i[1]], width=2 ),
                                 mode='lines') for i,j in dff.groupby(['model','scenario']) ] }
+
+@app.callback( Output('month-dropdown', 'disabled'), [Input('all-month-check','values')] )
+def disable_month_dropdown( month_check ):
+    if 'all' in month_check:
+        return True
+    else:
+        return False
+
+# @app.callback( Output('month-dropdown', 'value'), [Input('all-month-check','values')] )
+# def update_month_dropdown_disabled( month_check ):
+#     if 'all' in month_check:
+#         return True
+#     else:
+#         return False
+
 
 if __name__ == '__main__':
     app.run_server( debug=True )

@@ -114,17 +114,20 @@ app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 app.layout = html.Div([ 
                 html.Div([
                     html.Div([
-                        html.H4('NWT Climate Scenarios Explorer -- Mining')],id='mdown-head'),
-                        html.Img(src='data:image/gif;base64,{}'.format(encoded_images[0])),
-                        html.Img(src='data:image/png;base64,{}'.format(encoded_images)[1])
+                            html.H4('NWT Climate Scenarios Explorer'),
+                            html.H5('Decadal Monthly Mean Temperatures'),
+                            html.Img(src='data:image/gif;base64,{}'.format(encoded_images[0])),
+                            html.Img(src='data:image/png;base64,{}'.format(encoded_images)[1])
+                        ],id='mdown-head', className='row'),
+
                         ]),
                 html.Div([ 
                     html.Div([
                         dcc.Tabs( 
                             id='tabs',
                             tabs=[
-                                {'label': 'Decadal Monthly Mean Temperatures -- Mines', 'value': 1},
-                                {'label': 'Decadal Monthly Mean Temperatures -- NWT Province-wide', 'value': 2},
+                                {'label': 'Mine Sites', 'value': 1},
+                                {'label': 'NWT Province-wide', 'value': 2},
                             ],
                             value=1,
                             vertical=False

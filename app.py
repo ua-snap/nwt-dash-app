@@ -32,7 +32,7 @@ for k,v in data.items():
 del df, data
 
 # LAYOUT STATIC IMAGES:
-static_files = ['./images/Northwest_Territories.gif','./images/snap_color.png']
+static_files = ['./images/funders.png']
 encoded_images = [base64.b64encode(open(image_filename, 'rb').read()) for image_filename in static_files]
 
 # welcome to the wild west folks!!! :(
@@ -114,11 +114,13 @@ app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 app.layout = html.Div([ 
                 html.Div([
                     html.Div([
-                            html.H4('NWT Climate Scenarios Explorer'),
-                            dcc.Markdown(children='Decadal Monthly Mean Temperatures'),
-                            html.Img(src='data:image/gif;base64,{}'.format(encoded_images[0])),
-                            html.Img(src='data:image/png;base64,{}'.format(encoded_images)[1])
-                        ],id='mdown-head', className='row'),
+                            html.Div([
+                                html.H4('NWT Climate Scenarios Explorer'),
+                                dcc.Markdown(children='Decadal Monthly Mean Temperatures')],
+                            className='nine columns'),
+                            html.Div([ html.Img(src='data:image/png;base64,{}'.format(encoded_images[0].decode()), style={'width': '250px'}) ], className='three columns' ),
+                            # html.Div([ html.Img(src='data:image/gif;base64,{}'.format(encoded_images[0].decode())) ], className='')
+                        ], id='mdown-head', className='row'),
 
                         ]),
                 html.Div([ 

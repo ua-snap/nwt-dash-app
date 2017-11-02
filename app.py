@@ -98,7 +98,7 @@ __How to use this application:__
 - select combinations of model(s)/scenario(s)/year-ranges for a 
 mine site and display plots.
 - mine can also be selected from the map above.
-- toggle between annual/monthly outputs with tabs. if multiple months are chosen, they are averaged.
+- toggle between minesites/NWT-wide outputs with tabs. if multiple months are chosen, they are averaged.
 check 'all months' for annual decadal means.
 - plot is interactive and addt'l toolbars display on hover.
 - __[ note ]: too many combinations of models/scenarios generates a busy graphic.__

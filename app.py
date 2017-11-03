@@ -119,7 +119,7 @@ app.layout = html.Div([
                             className='nine columns'),
                             html.Div([ html.Img(src='data:image/png;base64,{}'.format(encoded_images[0].decode()), style={'width': '200px'}) ], className='three columns' ),
                         ], id='mdown-head', className='row'),
-
+                    # html.Hr( style={'linecolor':'green'}),
                         ]),
                 html.Div([ 
                     html.Div([
@@ -147,17 +147,17 @@ app.layout = html.Div([
                                         labelStyle={'display': 'inline-block'}
                                     )], className='four columns'),
                             html.Div([ 
-                                        html.Label('Choose Month(s)', style={'font-weight':'bold'}),
-                                        dcc.Checklist(id='all-month-check', 
-                                            options=[{'label':'all months','value':'all'}],
-                                            values=[],
-                                            labelStyle={'display': 'inline-block'} ),
-                                        dcc.Dropdown(
-                                            id='month-dropdown',
-                                            options=[ {'label':i, 'value':i} for i in list(range(1, 12+1)) ],
-                                            value=[1],
-                                            multi=True,
-                                            disabled=False ) ], id='month-div', className='four columns')
+                                    html.Label('Choose Month(s)', style={'font-weight':'bold'}),
+                                    dcc.Checklist(id='all-month-check', 
+                                        options=[{'label':'all months','value':'all'}],
+                                        values=[],
+                                        labelStyle={'display': 'inline-block'} ),
+                                    dcc.Dropdown(
+                                        id='month-dropdown',
+                                        options=[ {'label':i, 'value':i} for i in list(range(1, 12+1)) ],
+                                        value=[1],
+                                        multi=True,
+                                        disabled=False ) ], id='month-div', className='four columns')
                             ], className='row'),
 
                         html.Label('Choose Model(s)', style={'font-weight':'bold'}),
@@ -174,9 +174,9 @@ app.layout = html.Div([
                                 min=df['year'].min(),
                                 max=df['year'].max(),
                                 step=1,
-                                value=[df['year'].unique().min(), df['year'].unique().max()]
+                                value=[df['year'].unique().min(), df['year'].unique().max()],
                             )
-                        ], className='eleven columns'),
+                        ], style={'width':'85%', 'margin':'0 auto'}),
                     ], className="eight columns" ),
 
                     html.Div([
@@ -194,7 +194,6 @@ df = None
 # # INTERACTIVITY 
 @app.callback( Output('mines-div', 'style'), [Input('tabs','value')] )
 def update_mines_div( selected_tab_value ):
-    # print('selected_tab_value={}'.format(selected_tab_value) )
     if selected_tab_value == 1:
         return None
     elif selected_tab_value == 2:
@@ -203,7 +202,6 @@ def update_mines_div( selected_tab_value ):
 
 @app.callback( Output('minesites-dropdown', 'value'), [Input('minesites-map', 'clickData')])
 def update_minesite_radio( clickdata ):
-    # print(clickdata)
     if clickdata is not None: # make it draw the inital graph before a clickevent
         return clickdata['points'][0]['text'].replace(' ', '_')
     else:
@@ -288,14 +286,6 @@ def disable_month_dropdown( month_check ):
         return True
     else:
         return False
-
-# @app.callback( Output('month-dropdown', 'value'), [Input('all-month-check','values')] )
-# def update_month_dropdown_disabled( month_check ):
-#     if 'all' in month_check:
-#         return True
-#     else:
-#         return False
-
 
 if __name__ == '__main__':
     app.run_server( debug=True )

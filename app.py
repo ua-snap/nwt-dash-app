@@ -108,20 +108,20 @@ server = app.server
 server.secret_key = os.environ['SERVER_SECRET_KEY']
 app.config.supress_callback_exceptions = True
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
-
+app.title = 'NWT Climate Scenarios Explorer' # this is a hack and will break in the future...
 
 # COLORS
 # nwt = rgba(67, 153, 174, 0.37) OR #4399AE
 # snap_back = rgba(150,167,58,0.3) OR #96A73A
 
 # # BUILD PAGE LAYOUT
-app.layout = html.Div([ 
+app.layout = html.Div([
                 html.Div([
                     html.Div([
                             html.Div([
-                                html.H3([html.Div([html.Span('Northwest Territories ', style={'color':'#4399AE'}), html.Span('Climate Scenarios Explorer', style={'color':'#96A73A'}), html.Span('.', style={'color':'white'})], 
+                                html.H3([html.Div([html.Span('Northwest Territories ', style={'color':'#4399AE', 'font-family':'Calibri'}), html.Span('Climate Scenarios Explorer', style={'color':'#96A73A','font-family':'Calibri'}), html.Span('.', style={'color':'rgba(230, 249, 255,0.3)'})], 
                                         style={'border-style':'solid','border-width':2, 
-                                                'background-color':'rgba(230, 249, 255,0.3)',
+                                                'background-color':'rgba(242, 242, 242,0.25)',#'rgba(230, 249, 255,0.3)',
                                                 'border-color':'rgb(67, 153, 174)', 
                                                 'border-radius':'5',
                                                 'box-sizing': 'content-box',
@@ -130,7 +130,6 @@ app.layout = html.Div([
                             className='nine columns'),
                             html.Div([ html.Img(src='data:image/png;base64,{}'.format(encoded_images[0].decode()), style={'width': '200px'}) ], className='three columns'),
                         ], id='mdown-head', className='row'),
-                    # html.Hr( style={'linecolor':'green'}),
                         ]),
                 html.Div([ 
                     html.Div([

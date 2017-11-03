@@ -12,8 +12,6 @@ import base64
 # #  NWT -- ANNUAL / MONTHLY DECADAL TEMPERATURE AVERAGES application   # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-print(os.environ)
-
 # # APP INPUT DATA
 files = [ 'tas_minesites_decadal_monthly_mean_alldata_melted.csv', 
             'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv' ]
@@ -76,13 +74,12 @@ mapbox_config = dict(accesstoken=mapbox_access_token,
                                         below=0 )]
                         )
 
-map_layout = go.Layout(
-                    autosize=True,
+map_layout = go.Layout( autosize=True,
                     hovermode='closest',
                     mapbox=mapbox_config,
                     showlegend=False,
                     margin = dict(l = 0, r = 0, t = 0, b = 0)
-                     )
+                    )
 
 map_figure = go.Figure( dict(data=map_traces, layout=map_layout) )
 
@@ -117,11 +114,10 @@ app.layout = html.Div([
                 html.Div([
                     html.Div([
                             html.Div([
-                                html.H4('NWT Climate Scenarios Explorer'),
-                                dcc.Markdown(children='Decadal Monthly Mean Temperatures')],
+                                html.H3('NWT Climate Scenarios Explorer'),
+                                ],
                             className='nine columns'),
-                            html.Div([ html.Img(src='data:image/png;base64,{}'.format(encoded_images[0].decode()), style={'width': '250px'}) ], className='three columns' ),
-                            # html.Div([ html.Img(src='data:image/gif;base64,{}'.format(encoded_images[0].decode())) ], className='')
+                            html.Div([ html.Img(src='data:image/png;base64,{}'.format(encoded_images[0].decode()), style={'width': '200px'}) ], className='three columns' ),
                         ], id='mdown-head', className='row'),
 
                         ]),
@@ -267,25 +263,24 @@ def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_
     dff = dff.reset_index(drop=True)
     return dff.to_json()
 
-@app.callback( Output('my-graph', 'figure'), [Input('intermediate-value', 'children')] )
-def update_graph( data ):
+@app.callback( Output('my-graph', 'figure'), 
+            [Input('intermediate-value', 'children'),
+            Input('all-month-check','values')] )
+def update_graph( data, all_check ):
     print('updating graph')
     dff = pd.read_json( data ).sort_index()
 
-    if 'month' in dff.columns:
-        # its monthlies
-        return {'data':[ go.Scatter( x=j['year'], 
-                        y=j['tas'], 
-                        name=i[0]+' '+i[1], 
-                        line=dict(color=ms_colors[i[0]][i[1]], width=2 ),
-                        mode='lines') for i,j in dff.groupby(['model','scenario','month']) ] }
+    if 'all' in all_check:
+        title = 'Decadal Annual Mean Temperatures'
     else:
-        # its annuals
-        return {'data':[ go.Scatter( x=j['year'], 
-                                y=j['tas'],
-                                name=i[0]+' '+i[1], 
-                                line=dict(color=ms_colors[i[0]][i[1]], width=2 ),
-                                mode='lines') for i,j in dff.groupby(['model','scenario']) ] }
+        title = 'Decadal Monthly Mean Temperatures'
+
+    return {'data':[ go.Scatter( x=j['year'], 
+                    y=j['tas'], 
+                    name=i[0]+' '+i[1], 
+                    line=dict(color=ms_colors[i[0]][i[1]], width=2 ),
+                    mode='lines') for i,j in dff.groupby(['model','scenario','month']) ],
+            'layout':{'title':title, 'xaxis':dict(title='Decades'), 'yaxis':dict(title='Degrees Celcius')} }
 
 @app.callback( Output('month-dropdown', 'disabled'), [Input('all-month-check','values')] )
 def disable_month_dropdown( month_check ):

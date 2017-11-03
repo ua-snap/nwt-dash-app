@@ -12,6 +12,8 @@ import base64
 # #  NWT -- ANNUAL / MONTHLY DECADAL TEMPERATURE AVERAGES application   # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+print(os.environ())
+
 # # APP INPUT DATA
 files = [ 'tas_minesites_decadal_monthly_mean_alldata_melted.csv', 
             'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv' ]

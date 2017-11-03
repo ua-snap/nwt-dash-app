@@ -41,7 +41,7 @@ df = data[1] # hacky --> use this to build out some stuff in the layout...
 
 pts = pd.read_csv( './data/minesites.csv', index_col=0 )
 nwt_shape = './data/NorthwestTerritories_4326.geojson'
-mapbox_access_token = 'pk.eyJ1IjoiZWFydGhzY2llbnRpc3QiLCJhIjoiY2o4b3J5eXdwMDZ5eDM4cXU4dzJsMGIyZiJ9.a5IlzVUBGzJbQ0ayHC6t1w'
+mapbox_access_token = os.environ.get('MAPBOX_ACCESS_TOKEN')
 scenarios = ['rcp45','rcp60','rcp85']
 
 # # CONFIGURE MAPBOX AND DATA OVERLAYS
@@ -106,7 +106,7 @@ check 'all months' for annual decadal means.
 
 app = dash.Dash(__name__)
 server = app.server
-server.secret_key = 'SECRET-SNAP-KEY'
+server.secret_key = os.environ.get('SERVER_SECRET_KEY')
 app.config.supress_callback_exceptions = True
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 

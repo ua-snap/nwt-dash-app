@@ -41,7 +41,7 @@ df = data[1] # hacky --> use this to build out some stuff in the layout...
 
 pts = pd.read_csv( './data/minesites.csv', index_col=0 )
 nwt_shape = './data/NorthwestTerritories_4326.geojson'
-mapbox_access_token = os.environ['MAPBOX_ACCESS_TOKEN']
+mapbox_access_token = os.environ[ 'MAPBOX_ACCESS_TOKEN' ]
 scenarios = ['rcp45','rcp60','rcp85']
 
 # # CONFIGURE MAPBOX AND DATA OVERLAYS
@@ -119,7 +119,7 @@ app.layout = html.Div([
                 html.Div([
                     html.Div([
                             html.Div([
-                                html.H3([html.Div([html.Span('Northwest Territories ', style={'color':'#4399AE', 'font-family':'Calibri'}), html.Span('Climate Scenarios Explorer', style={'color':'#96A73A','font-family':'Calibri'}), html.Span('.', style={'color':'rgba(230, 249, 255,0.3)'})], 
+                                html.H3([html.Div([html.Span('Northwest Territories ', style={'color':'#4399AE', 'font-family':'Calibri'}), html.Span('Climate Scenarios Explorer', style={'color':'#96A73A','font-family':'Calibri'}), html.Span('.', style={'color':'rgba(230, 249, 255,0.3)'})], className='row'), 
                                         style={'border-style':'solid','border-width':2, 
                                                 'background-color':'rgba(242, 242, 242,0.25)',#'rgba(230, 249, 255,0.3)',
                                                 'border-color':'rgb(67, 153, 174)', 

@@ -30,9 +30,11 @@ if __name__ == '__main__':
     import pandas as pd
     import numpy as np
     
-    csv_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/NWT_DELIVERABLES/derived/tabular/mine_sites_profiles/monthly_decadals'
-    output_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/NWT_DELIVERABLES/downscaled/tabular/downscaled_domain_means/app_data'
-    l = [ i for i in glob.glob( os.path.join( csv_path, 'tas_*.csv') ) if '_historical_' not in i ]
+    csv_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/project_data_delivery/NWT_DELIVERABLES/derived/tabular/mine_sites_profiles/monthly_decadals'
+    output_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/project_data_delivery/NWT_DELIVERABLES/downscaled/tabular/downscaled_domain_means/app_data'
+    # output_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/test'
+    variable = 'pr'
+    l = [ i for i in glob.glob( os.path.join( csv_path, '{}_*.csv'.format(variable)) ) if '_historical_' not in i ]
     df = pd.concat([ melt_it( fn ) for fn in l ])
 
-    df.to_csv(os.path.join(output_path, 'tas_minesites_decadal_monthly_mean_alldata_melted.csv'))
+    df.to_csv( os.path.join( output_path, '{}_minesites_decadal_monthly_mean_alldata_melted.csv'.format(variable) ) )

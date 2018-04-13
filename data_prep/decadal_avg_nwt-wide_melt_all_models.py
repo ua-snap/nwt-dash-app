@@ -1,5 +1,5 @@
 # melt data for input to the tool as a giant csv queryable by PANDAS
-def make_monthly_decadals( fn ):
+def make_monthly_decadals( fn, variable ):
     ''' acrobatics to melt the NWT-wide data for app use'''
     df = pd.read_csv( fn, index_col=0 )
     decades = df.year.astype( str ).apply( lambda x: int(x[:3]+'0') )
@@ -17,7 +17,7 @@ def make_monthly_decadals( fn ):
     decadal_monthly_mean['model'] = [ i[0] for i in model_scenario ]
     decadal_monthly_mean['scenario'] = [ i[1] for i in model_scenario ]
     decadal_monthly_mean = decadal_monthly_mean.drop('variable', axis=1)
-    decadal_monthly_mean.columns = [ 'tas' if i == 'value' else i for i in decadal_monthly_mean.columns ]
+    decadal_monthly_mean.columns = [ variable if i == 'value' else i for i in decadal_monthly_mean.columns ]
     return decadal_monthly_mean
 
 if __name__ == '__main__':
@@ -26,16 +26,23 @@ if __name__ == '__main__':
     import numpy as np
 
     # monthly decadals
-    csv_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/NWT_DELIVERABLES/downscaled/tabular/downscaled_domain_means'
-    output_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/NWT_DELIVERABLES/downscaled/tabular/downscaled_domain_means/app_data'
-    
+    csv_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/project_data_delivery/NWT_DELIVERABLES/downscaled/tabular/downscaled_domain_means'
+    output_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/project_data_delivery/NWT_DELIVERABLES/downscaled/tabular/downscaled_domain_means/app_data'
+    variable = 'pr' # 'tas'
+
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    l = [ i for i in glob.glob( os.path.join( csv_path, 'tas_*.csv' )) if '_historical_' not in i ]
-    df = pd.concat([ make_monthly_decadals( fn ) for fn in l ])
+    l = [ i for i in glob.glob( os.path.join( csv_path, '{}_*.csv'.format(variable) )) if '_historical_' not in i ]
+    df = pd.concat([ make_monthly_decadals( fn, variable ) for fn in l ])
 
-    df.to_csv(os.path.join(output_path, 'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv'))
+    # round it?
+    if variable == 'tas':
+        df[variable] = df[variable].round(0)
+    elif variable == 'pr':
+        df[variable] = df[variable].round(1)
+
+    df.to_csv(os.path.join(output_path, '{}_fulldomain_decadal_monthly_mean_alldata_melted.csv'.format(variable)))
 
     # annual decadals
     df2 = df.groupby(['year', 'model','scenario'])\
@@ -45,4 +52,4 @@ if __name__ == '__main__':
             .sort_values(['model','scenario'])\
             .reset_index(drop=True)
 
-    df2.to_csv(os.path.join(output_path, 'tas_fulldomain_decadal_annual_mean_alldata_melted.csv'))
+    df2.to_csv(os.path.join(output_path, '{}_fulldomain_decadal_annual_mean_alldata_melted.csv'.format(variable)))

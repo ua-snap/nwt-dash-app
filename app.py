@@ -36,7 +36,7 @@ for k,v in data.items():
             out.append( df[df['year'] <= 2290 ] )
         else:
             out.append( df[df['year'] <= 2090 ] )
-        filtered_data[domain_lu[domain]][variable] = pd.concat( out )
+    filtered_data[domain_lu[domain]][variable] = pd.concat( out )
 
 del df, data
 
@@ -46,7 +46,7 @@ encoded_images = [base64.b64encode(open(image_filename, 'rb').read()) for image_
 
 # welcome to the wild west folks!!! :(
 data = filtered_data # ugly
-df = data[k] # hacky --> use this to build out some stuff in the layout...
+df = data[1]['tas'] # hacky --> use this to build out some stuff in the layout...
 
 pts = pd.read_csv( './data/minesites.csv', index_col=0 )
 nwt_shape = './data/NorthwestTerritories_4326.geojson'
@@ -115,7 +115,8 @@ check 'all months' for annual decadal means.
 
 app = dash.Dash(__name__)
 server = app.server
-server.secret_key = os.environ['SERVER_SECRET_KEY']
+# server.secret_key = os.environ['SERVER_SECRET_KEY']
+server.secret_key = 'SERVER_SECRET_KEY'
 app.config.supress_callback_exceptions = True
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 app.title = 'NWT Climate Scenarios Explorer' # this is a hack and will break in the future...
@@ -129,7 +130,7 @@ app.layout = html.Div([
                 html.Div([
                     html.Div([
                             html.Div([
-                                html.H3([html.Div([html.Span('Northwest Territories ', style={'color':'#4399AE', 'font-family':'Calibri'}), html.Span('Climate Scenarios Explorer', style={'color':'#96A73A','font-family':'Calibri'}), html.Span('.', style={'color':'rgba(230, 249, 255,0.3)'})], className='row'), 
+                                html.H3([html.Div([html.Span('Northwest Territories ', style={'color':'#4399AE', 'font-family':'Calibri'}), html.Span('Climate Scenarios Explorer', style={'color':'#96A73A','font-family':'Calibri'}), html.Span('.', style={'color':'rgba(230, 249, 255,0.3)'})], 
                                         style={'border-style':'solid','border-width':2, 
                                                 'background-color':'rgba(242, 242, 242,0.25)',#'rgba(230, 249, 255,0.3)',
                                                 'border-color':'rgb(67, 153, 174)', 
@@ -167,14 +168,13 @@ app.layout = html.Div([
                                         labelStyle={'display': 'inline-block'}
                                     )], className='four columns'),
                             html.Div([ 
-                                    html.Label('Choose Month(s)', style={'font-weight':'bold'}),
+                                    html.Label('Choose Variable', style={'font-weight':'bold'}),
                                     dcc.Dropdown(
                                         id='variable-dropdown',
                                         options=[ {'label':i, 'value':i} for i in ['tas','pr'] ],
-                                        value=[1],
+                                        value='tas',
                                         multi=False,
-                                        disabled=False ) ], id='variable-div', className='four columns'
-                                ),
+                                        disabled=False ) ], className='four columns'),                            
                             html.Div([ 
                                     html.Label('Choose Month(s)', style={'font-weight':'bold'}),
                                     dcc.Checklist(id='all-month-check', 
@@ -215,6 +215,7 @@ app.layout = html.Div([
             ]),
         html.Div(id='intermediate-value', style={'display': 'none'}),
         ])
+
 
 # cleanup
 del df 
@@ -260,12 +261,14 @@ def average_months( dff, model, scenario ):
                 Input('model-dropdown', 'value'),
                 Input('month-dropdown','value'),
                 Input('all-month-check', 'values'), 
-                Input('variable-dropdown', 'values')] )
-def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_values, months, all_check, variable ):
+                Input('variable-dropdown', 'value')] )
+def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_values, months, all_check, variable_value ):
     import itertools
     print( 'prepping data' )
+    print(f'selected_tab_value:{selected_tab_value}')
+    print(f'variable:{variable_value}')
 
-    cur_df = data[ selected_tab_value ][ variable ].copy()
+    cur_df = data[ selected_tab_value ][ variable_value ].copy()
     if 'group' in cur_df.columns:
         cur_df = cur_df.drop( 'group', axis=1 )
    

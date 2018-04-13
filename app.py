@@ -7,27 +7,36 @@ import pandas as pd
 import geopandas as gpd
 import numpy as np
 import base64
+from collections import defaultdict
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # #  NWT -- ANNUAL / MONTHLY DECADAL TEMPERATURE AVERAGES application   # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # # APP INPUT DATA
-files = [ 'tas_minesites_decadal_monthly_mean_alldata_melted.csv', 
-            'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv' ]
+files = [ 
+            'tas_minesites_decadal_monthly_mean_alldata_melted.csv', 
+            'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv',
+            'pr_minesites_decadal_monthly_mean_alldata_melted.csv', 
+            'pr_fulldomain_decadal_monthly_mean_alldata_melted.csv' 
+        ]
 
 files = [ os.path.join( '.','data',fn ) for fn in files ]
-data = { count+1:pd.read_csv(fn, index_col=0) for count, fn in enumerate( files ) }
+# [ os.path.basename(fn).split('_')[:2] for fn in files ]
+
+data = { '_'.join(os.path.basename(fn).split('_')[:2]):pd.read_csv(fn, index_col=0) for count, fn in enumerate( files ) }
 # make sure we only have the years with full decades... this is kinda tricky...
-filtered_data = dict()
+filtered_data = defaultdict( dict )
+domain_lu = {'minesites':1, 'fulldomain':2}
 for k,v in data.items():
+    variable, domain = k.split('_')
     out = []
     for i,df in v.groupby(['model','scenario']):
         if df['year'].max() > 2100:
             out.append( df[df['year'] <= 2290 ] )
         else:
             out.append( df[df['year'] <= 2090 ] )
-        filtered_data[k] = pd.concat( out )
+        filtered_data[domain_lu[domain]][variable] = pd.concat( out )
 
 del df, data
 
@@ -37,11 +46,12 @@ encoded_images = [base64.b64encode(open(image_filename, 'rb').read()) for image_
 
 # welcome to the wild west folks!!! :(
 data = filtered_data # ugly
-df = data[1] # hacky --> use this to build out some stuff in the layout...
+df = data[k] # hacky --> use this to build out some stuff in the layout...
 
 pts = pd.read_csv( './data/minesites.csv', index_col=0 )
 nwt_shape = './data/NorthwestTerritories_4326.geojson'
-mapbox_access_token = os.environ[ 'MAPBOX_ACCESS_TOKEN' ]
+# mapbox_access_token = os.environ[ 'MAPBOX_ACCESS_TOKEN' ]
+mapbox_access_token = 'SERVER_SECRET_KEY'
 scenarios = ['rcp45','rcp60','rcp85']
 
 # # CONFIGURE MAPBOX AND DATA OVERLAYS
@@ -158,6 +168,15 @@ app.layout = html.Div([
                                     )], className='four columns'),
                             html.Div([ 
                                     html.Label('Choose Month(s)', style={'font-weight':'bold'}),
+                                    dcc.Dropdown(
+                                        id='variable-dropdown',
+                                        options=[ {'label':i, 'value':i} for i in ['tas','pr'] ],
+                                        value=[1],
+                                        multi=False,
+                                        disabled=False ) ], id='variable-div', className='four columns'
+                                ),
+                            html.Div([ 
+                                    html.Label('Choose Month(s)', style={'font-weight':'bold'}),
                                     dcc.Checklist(id='all-month-check', 
                                         options=[{'label':'all months','value':'all'}],
                                         values=[],
@@ -240,12 +259,13 @@ def average_months( dff, model, scenario ):
                 Input('scenario-check', 'values'),
                 Input('model-dropdown', 'value'),
                 Input('month-dropdown','value'),
-                Input('all-month-check', 'values')] )
-def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_values, months, all_check ):
+                Input('all-month-check', 'values'), 
+                Input('variable-dropdown', 'values')] )
+def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_values, months, all_check, variable ):
     import itertools
     print( 'prepping data' )
 
-    cur_df = data[ selected_tab_value ].copy()
+    cur_df = data[ selected_tab_value ][ variable ].copy()
     if 'group' in cur_df.columns:
         cur_df = cur_df.drop( 'group', axis=1 )
    

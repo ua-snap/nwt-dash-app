@@ -32,7 +32,7 @@ if __name__ == '__main__':
     output_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/project_data_delivery/NWT_DELIVERABLES/downscaled/tabular/downscaled_domain_means/app_data'
     variable = 'pr'
 
-    l = [ i for i in glob.glob( os.path.join( csv_path, '{}_*.csv'.format(variable)) ) if '_historical_' not in i ]
+    l = [ i for i in glob.glob( os.path.join( csv_path, '{}_*.csv'.format(variable)) ) if '_historical_' not in i and '_mean_' in i ]
     df = pd.concat([ melt_it( fn, variable ) for fn in l ])
 
     df.to_csv(os.path.join(output_path, '{}_minesites_decadal_annual_mean_alldata_melted.csv'.format(variable)))

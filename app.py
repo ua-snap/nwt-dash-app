@@ -30,12 +30,14 @@ filtered_data = defaultdict( dict )
 domain_lu = {'minesites':1, 'fulldomain':2}
 for k,v in data.items():
     variable, domain = k.split('_')
+    print(variable)
     out = []
     for i,df in v.groupby(['model','scenario']):
         if df['year'].max() > 2100:
             out.append( df[df['year'] <= 2290 ] )
         else:
             out.append( df[df['year'] <= 2090 ] )
+
     filtered_data[domain_lu[domain]][variable] = pd.concat( out )
 
 del df, data
@@ -51,7 +53,7 @@ df = data[1]['tas'] # hacky --> use this to build out some stuff in the layout..
 pts = pd.read_csv( './data/minesites.csv', index_col=0 )
 nwt_shape = './data/NorthwestTerritories_4326.geojson'
 # mapbox_access_token = os.environ[ 'MAPBOX_ACCESS_TOKEN' ]
-mapbox_access_token = 'SERVER_SECRET_KEY'
+mapbox_access_token = 'pk.eyJ1IjoiZWFydGhzY2llbnRpc3QiLCJhIjoiY2o4b3J5eXdwMDZ5eDM4cXU4dzJsMGIyZiJ9.a5IlzVUBGzJbQ0ayHC6t1w'
 scenarios = ['rcp45','rcp60','rcp85']
 
 # # CONFIGURE MAPBOX AND DATA OVERLAYS
@@ -237,16 +239,16 @@ def update_minesite_radio( clickdata ):
     else:
         return 'Prairie_Creek_Mine'
 
-def average_months( dff, model, scenario ):
+def average_months( dff, model, scenario, variable_value ):
     ''' 
     in case of multiple months allowed to be chosen
     average all of the months together to single traces.
     '''
     print('averaging months')
     sub_df = dff[(dff['model'] == model) & (dff['scenario'] == scenario)]
-    dfm = sub_df.groupby( 'month' ).apply(lambda x: x['tas'].reset_index(drop=True)).T.mean(axis=1).copy()
+    dfm = sub_df.groupby( 'month' ).apply(lambda x: x[variable_value].reset_index(drop=True)).T.mean(axis=1).copy()
     # convert back to a DataFrame from the output Series...
-    dfm = dfm.to_frame(name='tas').reset_index(drop=True)
+    dfm = dfm.to_frame(name=variable_value).reset_index(drop=True)
     dfm['year'] = sub_df['year'].unique()
     dfm['model'] = model
     dfm['scenario'] = scenario
@@ -289,29 +291,42 @@ def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_
     dff = dff.loc[ dff[ 'month' ].isin( months ), ]
 
     if len(dff.month.unique()) > 1:
-        dff = pd.concat([ average_months( dff, m, s ) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique()) ], axis=0)
+        dff = pd.concat([ average_months( dff, m, s, variable_value ) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique()) ], axis=0)
 
     dff = dff.reset_index(drop=True)
     return dff.to_json()
 
 @app.callback( Output('my-graph', 'figure'), 
             [Input('intermediate-value', 'children'),
-            Input('all-month-check','values')] )
-def update_graph( data, all_check ):
+            Input('all-month-check','values'),
+            Input('variable-dropdown', 'value')] )
+def update_graph( data, all_check, variable_value ):
     print('updating graph')
+    print(data)
     dff = pd.read_json( data ).sort_index()
+    print( '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -' )
+    print(dff.columns)
+
+    name_lu = {'tas':'Temperature', 'pr':'Precipitation'}
+    metric_lu = {'tas':'Mean','pr':'Total'}
 
     if 'all' in all_check:
-        title = 'Decadal Annual Mean Temperatures'
+        title_lu = {'tas':'Decadal Annual Mean Temperatures',
+                    'pr':'Decadal Annual Mean Precipitation'}
+        title = title_lu[ variable_value ]
     else:
-        title = 'Decadal Monthly Mean Temperatures'
+        title_lu = {'tas':'Decadal Monthly Mean Temperatures',
+                    'pr':'Decadal Monthly Mean Precipitation'}                  
+        title = title_lu[ variable_value ]
+
+    yaxis_title = {'tas':'Degrees Celcius', 'pr':'millimeters'}
 
     return {'data':[ go.Scatter( x=j['year'], 
-                    y=j['tas'], 
+                    y=j[variable_value], 
                     name=i[0]+' '+i[1], 
                     line=dict(color=ms_colors[i[0]][i[1]], width=2 ),
                     mode='lines') for i,j in dff.groupby(['model','scenario','month']) ],
-            'layout':{'title':title, 'xaxis':dict(title='Decades'), 'yaxis':dict(title='Degrees Celcius')} }
+            'layout':{'title':title, 'xaxis':dict(title='Decades'), 'yaxis':dict(title=yaxis_title[variable_value])} }
 
 @app.callback( Output('month-dropdown', 'disabled'), [Input('all-month-check','values')] )
 def disable_month_dropdown( month_check ):

@@ -33,7 +33,7 @@ if __name__ == '__main__':
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    l = [ i for i in glob.glob( os.path.join( csv_path, '{}_*.csv'.format(variable) )) if '_historical_' not in i ]
+    l = [ i for i in glob.glob( os.path.join( csv_path, '{}_*.csv'.format(variable) )) if '_historical_' not in i and '_mean_' in i ]
     df = pd.concat([ make_monthly_decadals( fn, variable ) for fn in l ])
 
     # round it?

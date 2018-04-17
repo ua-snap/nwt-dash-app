@@ -7,7 +7,7 @@ def split_fn( fn ):
     d.update( fn=fn ) # slice off junk at end
     return d
 
-def melt_it( fn ):
+def melt_it( fn, variable ):
     attrs = split_fn( fn )
     df = pd.read_csv( fn, index_col=0 )
     df = df.reset_index()
@@ -15,7 +15,7 @@ def melt_it( fn ):
     cols[0] = 'year'
     df.columns = cols
     df = df.melt( id_vars=['year'], value_vars=[i for i in df.columns if i is not 'year' ])
-    cols = ['year','minesite','tas']
+    cols = ['year','minesite',variable]
     df.columns = cols
     df['year'] = [ int(i.split('s')[0]) for i in df.year ]
     df['group'] = '{}_{}'.format(attrs['timestep'],attrs['agg'])
@@ -28,9 +28,11 @@ if __name__ == '__main__':
     import pandas as pd
     import numpy as np
     
-    csv_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/NWT_DELIVERABLES/derived/tabular/mine_sites_profiles/annual_decadals_from_monthly_decadals'
-    output_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/NWT_DELIVERABLES/downscaled/tabular/downscaled_domain_means/app_data'
-    l = [ i for i in glob.glob( os.path.join( csv_path, 'tas_*.csv') ) if '_historical_' not in i ]
-    df = pd.concat([ melt_it( fn ) for fn in l ])
+    csv_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/project_data_delivery/NWT_DELIVERABLES/derived/tabular/mine_sites_profiles/annual_decadals_from_monthly_decadals'
+    output_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/project_data_delivery/NWT_DELIVERABLES/downscaled/tabular/downscaled_domain_means/app_data'
+    variable = 'pr'
 
-    df.to_csv(os.path.join(output_path, 'tas_minesites_decadal_annual_mean_alldata_melted.csv'))
+    l = [ i for i in glob.glob( os.path.join( csv_path, '{}_*.csv'.format(variable)) ) if '_historical_' not in i and '_mean_' in i ]
+    df = pd.concat([ melt_it( fn, variable ) for fn in l ])
+
+    df.to_csv(os.path.join(output_path, '{}_minesites_decadal_annual_mean_alldata_melted.csv'.format(variable)))

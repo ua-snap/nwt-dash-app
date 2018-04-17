@@ -7,27 +7,38 @@ import pandas as pd
 import geopandas as gpd
 import numpy as np
 import base64
+from collections import defaultdict
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # #  NWT -- ANNUAL / MONTHLY DECADAL TEMPERATURE AVERAGES application   # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # # APP INPUT DATA
-files = [ 'tas_minesites_decadal_monthly_mean_alldata_melted.csv', 
-            'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv' ]
+files = [ 
+            'tas_minesites_decadal_monthly_mean_alldata_melted.csv', 
+            'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv',
+            'pr_minesites_decadal_monthly_mean_alldata_melted.csv', 
+            'pr_fulldomain_decadal_monthly_mean_alldata_melted.csv' 
+        ]
 
 files = [ os.path.join( '.','data',fn ) for fn in files ]
-data = { count+1:pd.read_csv(fn, index_col=0) for count, fn in enumerate( files ) }
+# [ os.path.basename(fn).split('_')[:2] for fn in files ]
+
+data = { '_'.join(os.path.basename(fn).split('_')[:2]):pd.read_csv(fn, index_col=0) for count, fn in enumerate( files ) }
 # make sure we only have the years with full decades... this is kinda tricky...
-filtered_data = dict()
+filtered_data = defaultdict( dict )
+domain_lu = {'minesites':1, 'fulldomain':2}
 for k,v in data.items():
+    variable, domain = k.split('_')
+    print(variable)
     out = []
     for i,df in v.groupby(['model','scenario']):
         if df['year'].max() > 2100:
             out.append( df[df['year'] <= 2290 ] )
         else:
             out.append( df[df['year'] <= 2090 ] )
-        filtered_data[k] = pd.concat( out )
+
+    filtered_data[domain_lu[domain]][variable] = pd.concat( out )
 
 del df, data
 
@@ -37,11 +48,12 @@ encoded_images = [base64.b64encode(open(image_filename, 'rb').read()) for image_
 
 # welcome to the wild west folks!!! :(
 data = filtered_data # ugly
-df = data[1] # hacky --> use this to build out some stuff in the layout...
+df = data[1]['tas'] # hacky --> use this to build out some stuff in the layout...
 
 pts = pd.read_csv( './data/minesites.csv', index_col=0 )
 nwt_shape = './data/NorthwestTerritories_4326.geojson'
-mapbox_access_token = os.environ['MAPBOX_ACCESS_TOKEN']
+# mapbox_access_token = os.environ[ 'MAPBOX_ACCESS_TOKEN' ]
+mapbox_access_token = 'pk.eyJ1IjoiZWFydGhzY2llbnRpc3QiLCJhIjoiY2o4b3J5eXdwMDZ5eDM4cXU4dzJsMGIyZiJ9.a5IlzVUBGzJbQ0ayHC6t1w'
 scenarios = ['rcp45','rcp60','rcp85']
 
 # # CONFIGURE MAPBOX AND DATA OVERLAYS
@@ -105,7 +117,8 @@ check 'all months' for annual decadal means.
 
 app = dash.Dash(__name__)
 server = app.server
-server.secret_key = os.environ['SERVER_SECRET_KEY']
+# server.secret_key = os.environ['SERVER_SECRET_KEY']
+server.secret_key = 'SERVER_SECRET_KEY'
 app.config.supress_callback_exceptions = True
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 app.title = 'NWT Climate Scenarios Explorer' # this is a hack and will break in the future...
@@ -157,6 +170,14 @@ app.layout = html.Div([
                                         labelStyle={'display': 'inline-block'}
                                     )], className='four columns'),
                             html.Div([ 
+                                    html.Label('Choose Variable', style={'font-weight':'bold'}),
+                                    dcc.Dropdown(
+                                        id='variable-dropdown',
+                                        options=[ {'label':i, 'value':i} for i in ['tas','pr'] ],
+                                        value='tas',
+                                        multi=False,
+                                        disabled=False ) ], className='four columns'),                            
+                            html.Div([ 
                                     html.Label('Choose Month(s)', style={'font-weight':'bold'}),
                                     dcc.Checklist(id='all-month-check', 
                                         options=[{'label':'all months','value':'all'}],
@@ -197,6 +218,7 @@ app.layout = html.Div([
         html.Div(id='intermediate-value', style={'display': 'none'}),
         ])
 
+
 # cleanup
 del df 
 df = None
@@ -217,16 +239,16 @@ def update_minesite_radio( clickdata ):
     else:
         return 'Prairie_Creek_Mine'
 
-def average_months( dff, model, scenario ):
+def average_months( dff, model, scenario, variable_value ):
     ''' 
     in case of multiple months allowed to be chosen
     average all of the months together to single traces.
     '''
     print('averaging months')
     sub_df = dff[(dff['model'] == model) & (dff['scenario'] == scenario)]
-    dfm = sub_df.groupby( 'month' ).apply(lambda x: x['tas'].reset_index(drop=True)).T.mean(axis=1).copy()
+    dfm = sub_df.groupby( 'month' ).apply(lambda x: x[variable_value].reset_index(drop=True)).T.mean(axis=1).copy()
     # convert back to a DataFrame from the output Series...
-    dfm = dfm.to_frame(name='tas').reset_index(drop=True)
+    dfm = dfm.to_frame(name=variable_value).reset_index(drop=True)
     dfm['year'] = sub_df['year'].unique()
     dfm['model'] = model
     dfm['scenario'] = scenario
@@ -240,12 +262,15 @@ def average_months( dff, model, scenario ):
                 Input('scenario-check', 'values'),
                 Input('model-dropdown', 'value'),
                 Input('month-dropdown','value'),
-                Input('all-month-check', 'values')] )
-def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_values, months, all_check ):
+                Input('all-month-check', 'values'), 
+                Input('variable-dropdown', 'value')] )
+def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_values, months, all_check, variable_value ):
     import itertools
     print( 'prepping data' )
+    print(f'selected_tab_value:{selected_tab_value}')
+    print(f'variable:{variable_value}')
 
-    cur_df = data[ selected_tab_value ].copy()
+    cur_df = data[ selected_tab_value ][ variable_value ].copy()
     if 'group' in cur_df.columns:
         cur_df = cur_df.drop( 'group', axis=1 )
    
@@ -266,29 +291,42 @@ def prep_data( selected_tab_value, minesite, year_range, scenario_values, model_
     dff = dff.loc[ dff[ 'month' ].isin( months ), ]
 
     if len(dff.month.unique()) > 1:
-        dff = pd.concat([ average_months( dff, m, s ) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique()) ], axis=0)
+        dff = pd.concat([ average_months( dff, m, s, variable_value ) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique()) ], axis=0)
 
     dff = dff.reset_index(drop=True)
     return dff.to_json()
 
 @app.callback( Output('my-graph', 'figure'), 
             [Input('intermediate-value', 'children'),
-            Input('all-month-check','values')] )
-def update_graph( data, all_check ):
+            Input('all-month-check','values'),
+            Input('variable-dropdown', 'value')] )
+def update_graph( data, all_check, variable_value ):
     print('updating graph')
+    print(data)
     dff = pd.read_json( data ).sort_index()
+    print( '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -' )
+    print(dff.columns)
+
+    name_lu = {'tas':'Temperature', 'pr':'Precipitation'}
+    metric_lu = {'tas':'Mean','pr':'Total'}
 
     if 'all' in all_check:
-        title = 'Decadal Annual Mean Temperatures'
+        title_lu = {'tas':'Decadal Annual Mean Temperatures',
+                    'pr':'Decadal Annual Mean Precipitation'}
+        title = title_lu[ variable_value ]
     else:
-        title = 'Decadal Monthly Mean Temperatures'
+        title_lu = {'tas':'Decadal Monthly Mean Temperatures',
+                    'pr':'Decadal Monthly Mean Precipitation'}                  
+        title = title_lu[ variable_value ]
+
+    yaxis_title = {'tas':'Degrees Celcius', 'pr':'millimeters'}
 
     return {'data':[ go.Scatter( x=j['year'], 
-                    y=j['tas'], 
+                    y=j[variable_value], 
                     name=i[0]+' '+i[1], 
                     line=dict(color=ms_colors[i[0]][i[1]], width=2 ),
                     mode='lines') for i,j in dff.groupby(['model','scenario','month']) ],
-            'layout':{'title':title, 'xaxis':dict(title='Decades'), 'yaxis':dict(title='Degrees Celcius')} }
+            'layout':{'title':title, 'xaxis':dict(title='Decades'), 'yaxis':dict(title=yaxis_title[variable_value])} }
 
 @app.callback( Output('month-dropdown', 'disabled'), [Input('all-month-check','values')] )
 def disable_month_dropdown( month_check ):

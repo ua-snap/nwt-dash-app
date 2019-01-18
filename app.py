@@ -134,8 +134,6 @@ check 'all months' for annual decadal means.
 '''
 
 app = dash.Dash(__name__)
-server = app.SERVER_SECRET_KEY
-server.secret_key = os.environ['SERVER_SECRET_KEY']
 app.config.supress_callback_exceptions = True
 app.css.append_css({'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 app.title = 'NWT Climate Scenarios Explorer' # this is a hack and will break in the future...
@@ -193,9 +191,9 @@ app.layout = html.Div(
                     [
                         dcc.Tabs(
                             id='tabs',
-                            tabs=[
-                                {'label': 'Mine Sites', 'value': 1},
-                                {'label': 'NWT Province-wide', 'value': 2},
+                            children=[
+                                dcc.Tab(label='Mine Sites', value=1),
+                                dcc.Tab(label='NWT Province-wide', value=2)
                             ],
                             value=1,
                             vertical=False
@@ -412,7 +410,7 @@ def prep_data(selected_tab_value, minesite, year_range, scenario_values, model_v
     dff = dff.loc[dff['month'].isin(months),]
 
     if len(dff.month.unique()) > 1:
-        dff = pd.concat([average_months(dff, m, s, variable_value) for m,s in itertools.product(dff.model.unique(), dff.scenario.unique())], axis=0)
+        dff = pd.concat([average_months(dff, m, s, variable_value) for m, s in itertools.product(dff.model.unique(), dff.scenario.unique())], axis=0)
 
     dff = dff.reset_index(drop=True)
     return dff.to_json()
@@ -421,11 +419,11 @@ def prep_data(selected_tab_value, minesite, year_range, scenario_values, model_v
     Output('my-graph', 'figure'),
     [
         Input('intermediate-value', 'children'),
-        Input('all-month-check','values'),
+        Input('all-month-check', 'values'),
         Input('variable-dropdown', 'value')
     ]
 )
-def update_graph( data, all_check, variable_value ):
+def update_graph(data, all_check, variable_value):
     """ Update graph from current application state """
     print('updating graph')
     print(data)

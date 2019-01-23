@@ -4,7 +4,6 @@ NWT Mine site future climate tool
 # pylint: disable=invalid-name, import-error, line-too-long, too-many-arguments
 import os
 import json
-import base64
 from collections import defaultdict
 import plotly.graph_objs as go
 import dash
@@ -51,14 +50,6 @@ for k, v in data.items():
     filtered_data[domain_lu[domain]][variable] = pd.concat(out)
 
 del df, data
-
-# LAYOUT STATIC IMAGES:
-static_files = ['./images/funders.png']
-encoded_images = [
-    base64.b64encode(
-        open(
-            image_filename,
-            'rb').read()) for image_filename in static_files]
 
 # welcome to the wild west folks!!! :(
 data = filtered_data  # ugly
@@ -187,11 +178,7 @@ app.layout = html.Div(
             ),
                 html.Div(
                 [
-                    html.Img(
-                        src='data:image/png;base64,{}'.format(
-                            encoded_images[0].decode()),
-                        style={'width': '200px'}
-                    )
+                    html.Img(src='assets/funders.png', className='funders')
                 ],
                 className='three columns'
             )

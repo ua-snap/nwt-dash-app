@@ -102,9 +102,6 @@ app = dash.Dash(__name__)
 # Beanstalk looks for application by default, if this isn't set you will get a WSGI error.
 application = app.server
 
-app.css.append_css(
-    {'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
-# this is a hack and will break in the future...
 app.title = 'NWT Climate Scenarios Explorer'
 
 # # BUILD PAGE LAYOUT

@@ -5,6 +5,7 @@ NWT Mine site future climate tool
 import os
 import json
 import pickle
+import itertools
 import plotly.graph_objs as go
 import dash
 from dash.dependencies import Input, Output
@@ -15,16 +16,14 @@ import pandas as pd
 with open('data.pickle', 'rb') as handle:
     data = pickle.load(handle)
 
-# hacky --> use this to build out some stuff in the layout...
+# data prep for initial display
 df = data[1]['tas']
 
-pts = pd.read_csv('./data/minesites.csv', index_col=0)
-nwt_shape = './data/NorthwestTerritories_4326.geojson'
+pts = pd.read_csv('minesites.csv', index_col=0)
 mapbox_access_token = os.environ['MAPBOX_ACCESS_TOKEN']
 
 scenarios = ['rcp45', 'rcp60', 'rcp85']
 
-# # CONFIGURE MAPBOX AND DATA OVERLAYS
 ptsd = list(pts.T.to_dict().values())
 del pts  # cleanup
 
@@ -57,13 +56,15 @@ mapbox_config = dict(
     pitch=0,
     zoom=3,
     center=dict(lat=64, lon=-116.6),
-    layers=[dict(
-        sourcetype='geojson',
-        source=json.loads(open(nwt_shape, 'r').read()),
-        type='fill',
-        color='rgba(163,22,19,0.1)',
-        below=0
-    )]
+    layers=[
+        dict(
+            sourcetype='geojson',
+            source=json.loads(open('./NorthwestTerritories_4326.geojson', 'r').read()),
+            type='fill',
+            color='rgba(163,22,19,0.1)',
+            below=0
+        )
+    ]
 )
 
 map_layout = go.Layout(
@@ -98,7 +99,9 @@ check 'all months' for annual decadal means.
 '''
 
 app = dash.Dash(__name__)
-app.config.supress_callback_exceptions = True
+# Beanstalk looks for application by default, if this isn't set you will get a WSGI error.
+application = app.server
+
 app.css.append_css(
     {'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 # this is a hack and will break in the future...
@@ -368,7 +371,6 @@ def prep_data(
         all_check,
         variable_value):
     """ Prepare data per user input """
-    import itertools
     print('prepping data')
     print(f'selected_tab_value: {selected_tab_value}')
     print(f'variable:{variable_value}')
@@ -411,11 +413,7 @@ def prep_data(
 )
 def update_graph(data, all_check, variable_value):
     """ Update graph from current application state """
-    print('updating graph')
-    print(data)
     dff = pd.read_json(data).sort_index()
-    print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
-    print(dff.columns)
 
     if 'all' in all_check:
         title_lu = {
@@ -466,13 +464,4 @@ def disable_month_dropdown(month_check):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
-    app.run_server()
-
-# # # # TEMP: FOR TESTING
-# selected_tab_value = 2
-# minesite = 'Prairie_Creek_Mine'
-# year_range = (2000, 2090)
-# scenario_values = ['rcp45', 'rcp85']
-# model_values = ['IPSL-CM5A-LR', 'MRI-CGCM3']
-# months = [1,2]
+    application.run(debug=True, port=8080)

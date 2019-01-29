@@ -12,70 +12,59 @@ from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
+import picnic_css_dash_components as pcdc
 
 with open('data.pickle', 'rb') as handle:
     data = pickle.load(handle)
 
 # data prep for initial display
 df = data[1]['tas']
-
 pts = pd.read_csv('minesites.csv', index_col=0)
 mapbox_access_token = os.environ['MAPBOX_ACCESS_TOKEN']
-
 scenarios = ['rcp45', 'rcp60', 'rcp85']
-
-ptsd = list(pts.T.to_dict().values())
-del pts  # cleanup
-
-textpositions = [
-    'top center',
-    'bottom center',
-    'top center',
-    'bottom right',
-    'middle left',
-    'bottom center',
-    'bottom center',
-    'bottom left'
-]
 
 map_traces = [
     go.Scattermapbox(
-        lat=[pt['Latitude']],
-        lon=[pt['Longitude']],
-        mode='markers+text',
-        marker=go.Marker(size=12, color='rgb(140,86,75)'),
-        text=[pt['Name']],
-        textposition=tp,
+        lat=pts.loc[:, 'Latitude'],
+        lon=pts.loc[:, 'Longitude'],
+        mode='markers',
+        marker=dict(
+            size=15,
+            color='rgb(140,86,75)'
+        ),
+        line={
+            'color': 'rgb(0, 0, 0)',
+            'width': 2
+        },
+        text=pts.loc[:, 'Name'],
         hoverinfo='text'
-    ) for tp, pt in zip(textpositions, ptsd)
+    )
 ]
-
-mapbox_config = dict(
-    accesstoken=mapbox_access_token,
-    bearing=0,
-    pitch=0,
-    zoom=3,
-    center=dict(lat=64, lon=-116.6),
-    layers=[
-        dict(
-            sourcetype='geojson',
-            source=json.loads(open('./NorthwestTerritories_4326.geojson', 'r').read()),
-            type='fill',
-            color='rgba(163,22,19,0.1)',
-            below=0
-        )
-    ]
-)
 
 map_layout = go.Layout(
     autosize=True,
     hovermode='closest',
-    mapbox=mapbox_config,
+    mapbox=dict(
+        accesstoken=mapbox_access_token,
+        zoom=3.5,
+        center=dict(lat=64, lon=-116.6),
+        layers=[
+            dict(
+                sourcetype='geojson',
+                source=json.loads(open('./NorthwestTerritories_4326.geojson', 'r').read()),
+                type='fill',
+                color='rgba(255,0,0,0.1)'
+            )
+        ]
+    ),
     showlegend=False,
     margin=dict(l=0, r=0, t=0, b=0)
 )
 
-map_figure = go.Figure(dict(data=map_traces, layout=map_layout))
+map_figure = go.Figure({
+    'data': map_traces,
+    'layout': map_layout
+})
 
 # LINE COLORS LOOKUP -- hacky but somewhat working
 ms_colors = {
@@ -87,258 +76,164 @@ ms_colors = {
     'NCAR-CCSM4': {'rcp45': '#C35817', 'rcp60': '#6F4E37', 'rcp85': '#493D26'}
 }
 
-markdown_map = '''
-__How to use this application:__
-- select combinations of model(s)/scenario(s)/year-ranges for a
-mine site and display plots.
-- mine can also be selected from the map above.
-- toggle between minesites/NWT-wide outputs with tabs. if multiple months are chosen, they are averaged.
-check 'all months' for annual decadal means.
-- plot is interactive and addt'l toolbars display on hover.
-- __[ note ]: too many combinations of models/scenarios generates a busy graphic.__
-'''
-
 app = dash.Dash(__name__)
 # Beanstalk looks for application by default, if this isn't set you will get a WSGI error.
 application = app.server
 
-app.css.append_css(
-    {'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
-# this is a hack and will break in the future...
 app.title = 'NWT Climate Scenarios Explorer'
+
+form_fields = [
+    html.Div(
+        className='region-selector form--wrapper',
+        children=[
+            dcc.Dropdown(
+                id='minesites-dropdown',
+                options=[
+                    {
+                        'label': i.replace('_', ' '),
+                        'value': i
+                    } for i in df.minesite.unique()
+                ],
+                value='Prairie_Creek_Mine',
+                multi=False,
+            ),
+            html.Span('or', className='form--inline--text'),
+            pcdc.PChecklist(
+                id='if-mine-site',
+                className='form--inline--text',
+                label='if-mine-site',
+                options=[
+                    {'label': 'Territory', 'value': 'territory'}
+                ],
+                values=[]
+            )
+        ]
+    ),
+
+    html.Div(className='form--wrapper', children=[
+        html.Label(
+            'Scenario(s):',
+            className='form--inline'
+        ),
+        pcdc.PChecklist(
+            id='scenario-check',
+            label='scenario',
+            options=[
+                {'label':'RCP4.5', 'value':'rcp45'},
+                {'label':'RCP6.0', 'value':'rcp60'},
+                {'label':'RCP8.5', 'value':'rcp85'}
+            ],
+            values=['rcp85'],
+            labelStyle={'display': 'inline-block'},
+            className='form--inline'
+        ),
+    ]),
+    html.Div(className='form--wrapper', children=[
+        pcdc.PRadios(
+            id='variable-toggle',
+            options=[
+                {'label': 'Temperature', 'value':'tas'},
+                {'label': 'Precipitation', 'value':'pr'}
+            ],
+            value='tas'
+        )
+    ]),
+    html.Div(
+        id='month-div',
+        className='form--wrapper',
+        children=[
+            pcdc.PChecklist(
+                id='all-month-check',
+                label='all-month-check',
+                options=[
+                    {'label': 'All months', 'value': 'all'}],
+                values=[],
+            ),
+            dcc.Dropdown(
+                id='month-dropdown',
+                options=[
+                    {'label': 'January', 'value': '1'},
+                    {'label': 'February', 'value': '2'},
+                    {'label': 'March', 'value': '3'},
+                    {'label': 'April', 'value': '4'},
+                    {'label': 'May', 'value': '5'},
+                    {'label': 'June', 'value': '6'},
+                    {'label': 'July', 'value': '7'},
+                    {'label': 'August', 'value': '8'},
+                    {'label': 'September', 'value': '9'},
+                    {'label': 'October', 'value': '10'},
+                    {'label': 'November', 'value': '11'},
+                    {'label': 'December', 'value': '12'}
+                ],
+                value=[1],
+                multi=True,
+                disabled=False
+            )
+        ]
+    ),
+
+    html.Div(className='form--wrapper', children=[
+        html.Label(
+            'Model(s)'
+        ),
+        dcc.Dropdown(
+            id='model-dropdown',
+            options=[{'label': i, 'value': i}
+                     for i in df.model.unique()],
+            value=['IPSL-CM5A-LR'],
+            multi=True
+        )
+    ]),
+
+    dcc.Graph(id='minesites-map', figure=map_figure, config={'displayModeBar': False})
+]
 
 # # BUILD PAGE LAYOUT
 app.layout = html.Div(
-    [html.Div(
-        [html.Div(
-            [html.Div(
-                [html.H3(
-                    [html.Div(
-                        [
-                            html.Span(
-                                'Northwest Territories ', style={
-                                    'color': '#4399AE', 'font-family': 'Calibri'}),
-                            html.Span(
-                                'Climate Scenarios Explorer', style={
-                                    'color': '#96A73A', 'font-family': 'Calibri'}),
-                            html.Span(
-                                '.', style={
-                                    'color': 'rgba(230, 249, 255,0.3)'})
-                        ],
-                        style={
-                            'border-style': 'solid',
-                            'border-width': 2,
-                            # 'rgba(230, 249, 255,0.3)',
-                            'background-color': 'rgba(242, 242, 242,0.25)',
-                            'border-color': 'rgb(67, 153, 174)',
-                                                'border-radius': '5',
-                                                'box-sizing': 'content-box',
-                                                'float': 'left'
-                        }
-                    )
-                    ]
+    className='flex three demo app-wrapper',
+    children=[
+        html.H1('Northwest Territories Climate Scenarios Explorer', className="full"),
+
+        html.Div(
+            id='leftcol',
+            className='column',
+            children=form_fields
+        ),
+
+        # Right column
+        html.Div(
+            className="two-third column",
+            children=[
+                dcc.Graph(id='my-graph'),
+                dcc.RangeSlider(
+                    id='range-slider',
+                    marks={str(year): str(year)
+                           for year in df['year'].unique()[::2]},
+                    min=df['year'].min(),
+                    max=df['year'].max(),
+                    step=1,
+                    value=[
+                        df['year'].unique().min(),
+                        df['year'].unique().max()
+                    ],
                 )
-                ],
-                className='nine columns'
-            ),
-                html.Div(
-                [
-                    html.Img(src='assets/funders.png', className='funders')
-                ],
-                className='three columns'
-            )
-            ],
-            id='mdown-head',
-            className='row'
-        )
-        ]
-    ),
-        html.Div(
-            [html.Div(
-                [dcc.Tabs(
-                    id='tabs',
-                    children=[
-                        dcc.Tab(label='Mine Sites', value=1),
-                        dcc.Tab(label='NWT Province-wide', value=2)
-                    ],
-                    value=1,
-                    vertical=False
-                ),
-                    html.Div(
-                    [html.Div(
-                        [html.Label(
-                            'Choose Minesite',
-                            style={'font-weight': 'bold'}
-                        ),
-                            dcc.Dropdown(
-                            id='minesites-dropdown',
-                            options=[
-                                {
-                                    'label': i.replace('_', ' '),
-                                    'value': i
-                                } for i in df.minesite.unique()
-                            ],
-                            value='Prairie_Creek_Mine',
-                            multi=False,
-                        )
-                        ],
-                        id='mines-div',
-                        className='four columns'
-                    ),
-                        html.Div(
-                        [
-                            html.Label(
-                                'Choose Scenario(s)',
-                                style={'font-weight': 'bold'}
-                            ),
-                            dcc.Checklist(
-                                id='scenario-check',
-                                options=[
-                                    {
-                                        'label': i,
-                                        'value': i
-                                    } for i in scenarios
-                                ],
-                                values=['rcp85'],
-                                labelStyle={'display': 'inline-block'}
-                            )
-                        ],
-                        className='four columns'
-                    ),
-                        html.Div(
-                        [
-                            html.Label(
-                                'Choose Variable',
-                                style={'font-weight': 'bold'}
-                            ),
-                            dcc.Dropdown(
-                                id='variable-dropdown',
-                                options=[
-                                    {
-                                        'label': i,
-                                        'value': i
-                                    } for i in ['tas', 'pr']
-                                ],
-                                value='tas',
-                                multi=False,
-                                disabled=False
-                            )
-                        ],
-                        className='four columns'
-                    ),
-                        html.Div(
-                        [
-                            html.Label(
-                                'Choose Month(s)',
-                                style={'font-weight': 'bold'}
-                            ),
-                            dcc.Checklist(
-                                id='all-month-check',
-                                options=[
-                                    {'label': 'all months', 'value': 'all'}],
-                                values=[],
-                                labelStyle={'display': 'inline-block'}
-                            ),
-                            dcc.Dropdown(
-                                id='month-dropdown',
-                                options=[{'label': i, 'value': i}
-                                         for i in list(range(1, 12 + 1))],
-                                value=[1],
-                                multi=True,
-                                disabled=False
-                            )
-                        ],
-                        id='month-div',
-                        className='four columns'
-                    )
-                    ],
-                    className='row'
-                ),
-                    html.Label(
-                    'Choose Model(s)', style={
-                        'font-weight': 'bold'}),
-                    dcc.Dropdown(
-                    id='model-dropdown',
-                    options=[{'label': i, 'value': i}
-                             for i in df.model.unique()],
-                    value=['IPSL-CM5A-LR'],
-                    multi=True
-                ),
-                    dcc.Graph(id='my-graph'),
-                    html.Div(
-                    [
-                        dcc.RangeSlider(
-                            id='range-slider',
-                            marks={str(year): str(year)
-                                   for year in df['year'].unique()[::2]},
-                            min=df['year'].min(),
-                            max=df['year'].max(),
-                            step=1,
-                            value=[
-                                df['year'].unique().min(),
-                                df['year'].unique().max()],
-                        )
-                    ], style={'width': '85%', 'margin': '0 auto'}
-                ),
-                ],
-                className="eight columns"
-            ),
-                html.Div(
-                    [
-                        dcc.Graph(id='minesites-map', figure=map_figure),
-                        dcc.Markdown(children=markdown_map)
-                    ],
-                    className="four columns"
-            ),
             ]
-    ),
-        html.Div(
-            id='intermediate-value',
-            style={'display': 'none'}
-    ),
+        )
     ]
 )
-
-# cleanup
-del df
-df = None
-
-# INTERACTIVITY
-
-
-@app.callback(
-    Output('mines-div', 'style'),
-    [Input('tabs', 'value')]
-)
-def update_mines_div(selected_tab_value):
-    if selected_tab_value == 1:
-        return None
-    elif selected_tab_value == 2:
-        return {'display': 'none'}
-
-
-@app.callback(
-    Output('minesites-dropdown', 'value'),
-    [Input('minesites-map', 'clickData')]
-)
-def update_minesite_radio(clickdata):
-    if clickdata is not None:  # make it draw the inital graph before a clickevent
-        return clickdata['points'][0]['text'].replace(' ', '_')
-    else:
-        return 'Prairie_Creek_Mine'
-
 
 def average_months(dff, model, scenario, variable_value):
     '''
     in case of multiple months allowed to be chosen
     average all of the months together to single traces.
     '''
-    print('averaging months')
     sub_df = dff[(dff['model'] == model) & (dff['scenario'] == scenario)]
     dfm = sub_df.groupby('month').apply(
         lambda x: x[variable_value].reset_index(
-            drop=True)).T.mean(
-        axis=1).copy()
+            drop=True)
+        ).T.mean(
+            axis=1
+        ).copy()
     # convert back to a DataFrame from the output Series...
     dfm = dfm.to_frame(name=variable_value).reset_index(drop=True)
     dfm['year'] = sub_df['year'].unique()
@@ -347,39 +242,71 @@ def average_months(dff, model, scenario, variable_value):
     dfm['month'] = '_'.join(['avg'] + [str(m) for m in dff.month.unique()])
     return dfm
 
+@app.callback(
+    Output('minesites-dropdown', 'disabled'),
+    [Input('if-mine-site', 'values')]
+)
+def disable_mine_sites(values):
+    """ Disable mine site selector when "Entire Territory" is selected """
+    return True if values else False
 
 @app.callback(
-    Output('intermediate-value', 'children'),
+    Output('month-dropdown', 'disabled'),
+    [Input('all-month-check', 'values')]
+)
+def disable_month_dropdown(values):
+    """ Disable months selector when "All months" is selected """
+    return True if values else False
+
+@app.callback(
+    Output('minesites-dropdown', 'value'),
     [
-        Input('tabs', 'value'),
+        Input('minesites-map', 'clickData'),
+        Input('if-mine-site', 'values')
+    ]
+)
+def update_mine_site_dropdown(selected_on_map, values):
+    """ If user clicks on the map, update the drop down. """
+     # if "territory-wide" is checked, ignore map clicks
+    if 'territory' in values:
+        return None
+    if selected_on_map is not None:
+        return selected_on_map['points'][0]['text'].replace(' ', '_')
+    # Return a default
+    return 'Prairie_Creek_Mine'
+
+@app.callback(
+    Output('my-graph', 'figure'),
+    [
+        Input('if-mine-site', 'values'),
         Input('minesites-dropdown', 'value'),
         Input('range-slider', 'value'),
         Input('scenario-check', 'values'),
         Input('model-dropdown', 'value'),
         Input('month-dropdown', 'value'),
         Input('all-month-check', 'values'),
-        Input('variable-dropdown', 'value')
+        Input('variable-toggle', 'value'),
+        Input('minesites-map', 'clickData')
     ]
 )
-def prep_data(
-        selected_tab_value,
-        minesite,
-        year_range,
-        scenario_values,
-        model_values,
-        months,
-        all_check,
-        variable_value):
-    """ Prepare data per user input """
-    print('prepping data')
-    print(f'selected_tab_value: {selected_tab_value}')
-    print(f'variable:{variable_value}')
+def update_graph(
+    if_mine_site,
+    minesite,
+    year_range,
+    scenario_values,
+    model_values,
+    months,
+    all_check,
+    variable_value,
+    selected_on_map):
+    """ Update graph from UI controls """
+    region_value = 2 if 'territory' in if_mine_site else 1
 
-    cur_df = data[selected_tab_value][variable_value].copy()
+    cur_df = data[region_value][variable_value].copy()
     if 'group' in cur_df.columns:
         cur_df = cur_df.drop('group', axis=1)
 
-    if selected_tab_value == 1:
+    if region_value == 1:
         dff = cur_df[(cur_df.minesite == minesite)].copy()
     else:
         dff = cur_df.copy()
@@ -400,20 +327,6 @@ def prep_data(
             dff.model.unique(), dff.scenario.unique())], axis=0)
 
     dff = dff.reset_index(drop=True)
-    return dff.to_json()
-
-
-@app.callback(
-    Output('my-graph', 'figure'),
-    [
-        Input('intermediate-value', 'children'),
-        Input('all-month-check', 'values'),
-        Input('variable-dropdown', 'value')
-    ]
-)
-def update_graph(data, all_check, variable_value):
-    """ Update graph from current application state """
-    dff = pd.read_json(data).sort_index()
 
     if 'all' in all_check:
         title_lu = {
@@ -449,18 +362,6 @@ def update_graph(data, all_check, variable_value):
             'yaxis': dict(title=yaxis_title[variable_value])
         }
     }
-
-
-@app.callback(
-    Output('month-dropdown', 'disabled'),
-    [Input('all-month-check', 'values')]
-)
-def disable_month_dropdown(month_check):
-    """ Disable the month dropdown if "All" is checked """
-    if 'all' in month_check:
-        return True
-    else:
-        return False
 
 
 if __name__ == '__main__':

@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700&subset=latin-ext');
+
+html, body {
+	font-family: 'Lato';
+}
+
+h1, h2, h3, h4 {
+	font-family: 'Lato';
+}
+
+img.funders {
+	width: 200px;
+}
+
+.column {
+	padding: 0 2ex !important;
+}
+
+.form--inline {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.form--wrapper {
+	margin-bottom: 1em;
+}
+
+.form--inline--text {
+	display: inline-block;
+	position: relative;
+	top: -1.3ex;
+	margin-left: 1em;
+}
+
+.region-selector #minesites-dropdown {
+	display: inline-block;
+	min-width: 15em;
+}
+
+#minesites-dropdown .Select.is-disabled .Select-value-label {
+	color: #ccc !important;
+}
+
+._dash-undo-redo {
+  display: none;
+}

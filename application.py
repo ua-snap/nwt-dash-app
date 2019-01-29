@@ -4,8 +4,8 @@ NWT Mine site future climate tool
 # pylint: disable=invalid-name, import-error, line-too-long, too-many-arguments
 import os
 import json
-import base64
-from collections import defaultdict
+import pickle
+import itertools
 import plotly.graph_objs as go
 import dash
 from dash.dependencies import Input, Output
@@ -13,65 +13,17 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# #  NWT -- ANNUAL / MONTHLY DECADAL TEMPERATURE AVERAGES application   # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+with open('data.pickle', 'rb') as handle:
+    data = pickle.load(handle)
 
-# # APP INPUT DATA
-files = [
-    'tas_minesites_decadal_monthly_mean_alldata_melted.csv',
-    'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv',
-    'pr_minesites_decadal_monthly_mean_alldata_melted.csv',
-    'pr_fulldomain_decadal_monthly_mean_alldata_melted.csv'
-]
-
-files = [os.path.join('.', 'data', fn) for fn in files]
-
-data = {
-    '_'.join(
-        os.path.basename(fn).split('_')[
-            :2]): pd.read_csv(
-                fn,
-                index_col=0) for count,
-    fn in enumerate(files)}
-
-# make sure we only have the years with full decades... this is kinda tricky...
-filtered_data = defaultdict(dict)
-domain_lu = {'minesites': 1, 'fulldomain': 2}
-for k, v in data.items():
-    variable, domain = k.split('_')
-    print(variable)
-    out = []
-    for i, df in v.groupby(['model', 'scenario']):
-        if df['year'].max() > 2100:
-            out.append(df[df['year'] <= 2290])
-        else:
-            out.append(df[df['year'] <= 2090])
-
-    filtered_data[domain_lu[domain]][variable] = pd.concat(out)
-
-del df, data
-
-# LAYOUT STATIC IMAGES:
-static_files = ['./images/funders.png']
-encoded_images = [
-    base64.b64encode(
-        open(
-            image_filename,
-            'rb').read()) for image_filename in static_files]
-
-# welcome to the wild west folks!!! :(
-data = filtered_data  # ugly
-# hacky --> use this to build out some stuff in the layout...
+# data prep for initial display
 df = data[1]['tas']
 
-pts = pd.read_csv('./data/minesites.csv', index_col=0)
-nwt_shape = './data/NorthwestTerritories_4326.geojson'
+pts = pd.read_csv('minesites.csv', index_col=0)
 mapbox_access_token = os.environ['MAPBOX_ACCESS_TOKEN']
 
 scenarios = ['rcp45', 'rcp60', 'rcp85']
 
-# # CONFIGURE MAPBOX AND DATA OVERLAYS
 ptsd = list(pts.T.to_dict().values())
 del pts  # cleanup
 
@@ -104,13 +56,15 @@ mapbox_config = dict(
     pitch=0,
     zoom=3,
     center=dict(lat=64, lon=-116.6),
-    layers=[dict(
-        sourcetype='geojson',
-        source=json.loads(open(nwt_shape, 'r').read()),
-        type='fill',
-        color='rgba(163,22,19,0.1)',
-        below=0
-    )]
+    layers=[
+        dict(
+            sourcetype='geojson',
+            source=json.loads(open('./NorthwestTerritories_4326.geojson', 'r').read()),
+            type='fill',
+            color='rgba(163,22,19,0.1)',
+            below=0
+        )
+    ]
 )
 
 map_layout = go.Layout(
@@ -145,7 +99,9 @@ check 'all months' for annual decadal means.
 '''
 
 app = dash.Dash(__name__)
-app.config.supress_callback_exceptions = True
+# Beanstalk looks for application by default, if this isn't set you will get a WSGI error.
+application = app.server
+
 app.css.append_css(
     {'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'})
 # this is a hack and will break in the future...
@@ -187,11 +143,7 @@ app.layout = html.Div(
             ),
                 html.Div(
                 [
-                    html.Img(
-                        src='data:image/png;base64,{}'.format(
-                            encoded_images[0].decode()),
-                        style={'width': '200px'}
-                    )
+                    html.Img(src='assets/funders.png', className='funders')
                 ],
                 className='three columns'
             )
@@ -419,7 +371,6 @@ def prep_data(
         all_check,
         variable_value):
     """ Prepare data per user input """
-    import itertools
     print('prepping data')
     print(f'selected_tab_value: {selected_tab_value}')
     print(f'variable:{variable_value}')
@@ -462,11 +413,7 @@ def prep_data(
 )
 def update_graph(data, all_check, variable_value):
     """ Update graph from current application state """
-    print('updating graph')
-    print(data)
     dff = pd.read_json(data).sort_index()
-    print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
-    print(dff.columns)
 
     if 'all' in all_check:
         title_lu = {
@@ -517,13 +464,4 @@ def disable_month_dropdown(month_check):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
-    app.run_server()
-
-# # # # TEMP: FOR TESTING
-# selected_tab_value = 2
-# minesite = 'Prairie_Creek_Mine'
-# year_range = (2000, 2090)
-# scenario_values = ['rcp45', 'rcp85']
-# model_values = ['IPSL-CM5A-LR', 'MRI-CGCM3']
-# months = [1,2]
+    application.run(debug=True, port=8080)

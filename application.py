@@ -235,13 +235,13 @@ main_layout = html.Div(
     children=[
         html.H1(
             'Northwest Territories Climate Scenarios Explorer',
-            className='title is-1'
+            className='title is-2'
         ),
         html.Div(
             className='columns',
             children=[
                 html.Div(
-                    className='column',
+                    className='column is-one-third',
                     children=form_fields
                 ),
                 html.Div(

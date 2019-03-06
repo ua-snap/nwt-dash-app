@@ -12,7 +12,6 @@ from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
-import picnic_css_dash_components as pcdc
 
 with open('data.pickle', 'rb') as handle:
     data = pickle.load(handle)
@@ -77,15 +76,46 @@ ms_colors = {
 }
 
 app = dash.Dash(__name__)
-# Beanstalk looks for application by default, if this isn't set you will get a WSGI error.
+# AWS Elastic Beanstalk looks for application by default,
+# if this variable (application) isn't set you will get a WSGI error.
 application = app.server
-
 app.title = 'NWT Climate Scenarios Explorer'
 
-form_fields = [
-    html.Div(
-        className='region-selector form--wrapper',
-        children=[
+navbar = html.Div(
+    className='navbar',
+    role='navigation',
+    children=[
+        html.Div(className='navbar-brand', children=[
+            html.A(
+                className='navbar-item',
+                href='#',
+                children=[
+                    html.Img(src='assets/SNAP_acronym_color.svg')
+                ]
+            )
+        ])
+    ]
+)
+
+footer = html.Footer(
+    className='footer',
+    children=[
+        html.Div(
+            className='content has-text-centered',
+            children=[
+                dcc.Markdown("""
+This is a page footer, where we'd put legal notes and other items.
+                    """)
+            ]
+        )
+    ]
+)
+
+minesites_dropdown_field = html.Div(
+    className='field',
+    children=[
+        html.Label('Location', className='label'),
+        html.Div(className='control', children=[
             dcc.Dropdown(
                 id='minesites-dropdown',
                 options=[
@@ -94,61 +124,60 @@ form_fields = [
                         'value': i
                     } for i in df.minesite.unique()
                 ],
-                value='Prairie_Creek_Mine',
-                multi=False,
-            ),
-            html.Span('or', className='form--inline--text'),
-            pcdc.PChecklist(
-                id='if-mine-site',
-                className='form--inline--text',
-                label='if-mine-site',
-                options=[
-                    {'label': 'Territory', 'value': 'territory'}
-                ],
-                values=[]
+                value='Prairie_Creek_Mine'
             )
-        ]
-    ),
+        ])
+    ]
+)
 
-    html.Div(className='form--wrapper', children=[
-        html.Label(
-            'Scenario(s):',
-            className='form--inline'
-        ),
-        pcdc.PChecklist(
+scenarios_checkbox_field = html.Div(
+    className='field',
+    children=[
+        html.Label('Scenario(s)', className='label'),
+        dcc.Checklist(
+            labelClassName='checkbox',
+            className='control',
             id='scenario-check',
-            label='scenario',
             options=[
-                {'label':'RCP4.5', 'value':'rcp45'},
-                {'label':'RCP6.0', 'value':'rcp60'},
-                {'label':'RCP8.5', 'value':'rcp85'}
+                {'label':' RCP4.5', 'value':'rcp45'},
+                {'label':' RCP6.0', 'value':'rcp60'},
+                {'label':' RCP8.5', 'value':'rcp85'}
             ],
-            values=['rcp85'],
-            labelStyle={'display': 'inline-block'},
-            className='form--inline'
-        ),
-    ]),
-    html.Div(className='form--wrapper', children=[
-        pcdc.PRadios(
+            values=['rcp85']
+        )
+    ]
+)
+
+variable_toggle_field = html.Div(
+    className='field',
+    children=[
+        html.Label('Variable', className='label'),
+        dcc.RadioItems(
+            labelClassName='radio',
+            className='control',
             id='variable-toggle',
             options=[
-                {'label': 'Temperature', 'value':'tas'},
-                {'label': 'Precipitation', 'value':'pr'}
+                {'label': ' Temperature', 'value':'tas'},
+                {'label': ' Precipitation', 'value':'pr'}
             ],
             value='tas'
         )
-    ]),
-    html.Div(
-        id='month-div',
-        className='form--wrapper',
-        children=[
-            pcdc.PChecklist(
-                id='all-month-check',
-                label='all-month-check',
-                options=[
-                    {'label': 'All months', 'value': 'all'}],
-                values=[],
-            ),
+    ]
+)
+
+months_field = html.Div(
+    className='field',
+    children=[
+        html.Label('Months', className='label'),
+        dcc.Checklist(
+            labelClassName='checkbox',
+            className='control',
+            id='all-month-check',
+            options=[
+                {'label': ' All months', 'value': 'all'}],
+            values=[]
+        ),
+        html.Div(className='control', children=[
             dcc.Dropdown(
                 id='month-dropdown',
                 options=[
@@ -169,13 +198,14 @@ form_fields = [
                 multi=True,
                 disabled=False
             )
-        ]
-    ),
+        ])
+    ]
+)
 
-    html.Div(className='form--wrapper', children=[
-        html.Label(
-            'Model(s)'
-        ),
+models_field = html.Div(
+    className='field',
+    children=[
+        html.Label('Models(s)', className='label'),
         dcc.Dropdown(
             id='model-dropdown',
             options=[{'label': i, 'value': i}
@@ -183,42 +213,66 @@ form_fields = [
             value=['IPSL-CM5A-LR'],
             multi=True
         )
-    ]),
+    ]
+)
 
-    dcc.Graph(id='minesites-map', figure=map_figure, config={'displayModeBar': False})
+form_fields = [
+    html.Div(
+        className='form',
+        children=[
+            minesites_dropdown_field,
+            scenarios_checkbox_field,
+            variable_toggle_field,
+            months_field,
+            models_field,
+            dcc.Graph(id='minesites-map', figure=map_figure, config={'displayModeBar': False})
+        ]
+    )
 ]
 
-# # BUILD PAGE LAYOUT
-app.layout = html.Div(
-    className='flex three demo app-wrapper',
+main_layout = html.Div(
+    className='section',
     children=[
-        html.H1('Northwest Territories Climate Scenarios Explorer', className="full"),
-
-        html.Div(
-            id='leftcol',
-            className='column',
-            children=form_fields
+        html.H1(
+            'Northwest Territories Climate Scenarios Explorer',
+            className='title is-1'
         ),
-
-        # Right column
         html.Div(
-            className="two-third column",
+            className='columns',
             children=[
-                dcc.Graph(id='my-graph'),
-                dcc.RangeSlider(
-                    id='range-slider',
-                    marks={str(year): str(year)
-                           for year in df['year'].unique()[::2]},
-                    min=df['year'].min(),
-                    max=df['year'].max(),
-                    step=1,
-                    value=[
-                        df['year'].unique().min(),
-                        df['year'].unique().max()
-                    ],
+                html.Div(
+                    className='column',
+                    children=form_fields
+                ),
+                html.Div(
+                    className='column',
+                    children=[
+                        dcc.Graph(id='my-graph'),
+                        dcc.RangeSlider(
+                            id='range-slider',
+                            marks={str(year): str(year)
+                                   for year in df['year'].unique()[::2]},
+                            min=df['year'].min(),
+                            max=df['year'].max(),
+                            step=1,
+                            value=[
+                                df['year'].unique().min(),
+                                df['year'].unique().max()
+                            ]
+                        )
+                    ]
                 )
             ]
         )
+    ]
+)
+
+app.layout = html.Div(
+    className='container',
+    children=[
+        navbar,
+        main_layout,
+        footer
     ]
 )
 
@@ -243,14 +297,6 @@ def average_months(dff, model, scenario, variable_value):
     return dfm
 
 @app.callback(
-    Output('minesites-dropdown', 'disabled'),
-    [Input('if-mine-site', 'values')]
-)
-def disable_mine_sites(values):
-    """ Disable mine site selector when "Entire Territory" is selected """
-    return True if values else False
-
-@app.callback(
     Output('month-dropdown', 'disabled'),
     [Input('all-month-check', 'values')]
 )
@@ -261,15 +307,12 @@ def disable_month_dropdown(values):
 @app.callback(
     Output('minesites-dropdown', 'value'),
     [
-        Input('minesites-map', 'clickData'),
-        Input('if-mine-site', 'values')
+        Input('minesites-map', 'clickData')
     ]
 )
-def update_mine_site_dropdown(selected_on_map, values):
+def update_mine_site_dropdown(selected_on_map):
     """ If user clicks on the map, update the drop down. """
      # if "territory-wide" is checked, ignore map clicks
-    if 'territory' in values:
-        return None
     if selected_on_map is not None:
         return selected_on_map['points'][0]['text'].replace(' ', '_')
     # Return a default
@@ -278,7 +321,6 @@ def update_mine_site_dropdown(selected_on_map, values):
 @app.callback(
     Output('my-graph', 'figure'),
     [
-        Input('if-mine-site', 'values'),
         Input('minesites-dropdown', 'value'),
         Input('range-slider', 'value'),
         Input('scenario-check', 'values'),
@@ -290,7 +332,6 @@ def update_mine_site_dropdown(selected_on_map, values):
     ]
 )
 def update_graph(
-    if_mine_site,
     minesite,
     year_range,
     scenario_values,
@@ -300,7 +341,7 @@ def update_graph(
     variable_value,
     selected_on_map):
     """ Update graph from UI controls """
-    region_value = 2 if 'territory' in if_mine_site else 1
+    region_value = 1
 
     cur_df = data[region_value][variable_value].copy()
     if 'group' in cur_df.columns:
@@ -342,7 +383,7 @@ def update_graph(
         title = title_lu[variable_value]
 
     yaxis_title = {
-        'tas': 'Degrees Celcius',
+        'tas': 'Degrees Celsius',
         'pr': 'millimeters'
     }
 

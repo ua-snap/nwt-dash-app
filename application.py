@@ -27,10 +27,10 @@ map_traces = [
         lat=pts.loc[:, 'Latitude'],
         lon=pts.loc[:, 'Longitude'],
         mode='markers',
-        marker=dict(
-            size=15,
-            color='rgb(140,86,75)'
-        ),
+        marker={
+            'size': 15,
+            'color': 'rgb(140,86,75)'
+        },
         line={
             'color': 'rgb(0, 0, 0)',
             'width': 2
@@ -81,32 +81,94 @@ app = dash.Dash(__name__)
 application = app.server
 app.title = 'NWT Climate Scenarios Explorer'
 
-navbar = html.Div(
-    className='navbar',
-    role='navigation',
+# We want this HTML structure to get the full-width background color:
+# <div class="header">
+#   <div class="container"> gives us the centered column
+#     <div class="section"> a bit more padding to stay consistent with form
+header_section = html.Div(
+    className='header',
     children=[
-        html.Div(className='navbar-brand', children=[
-            html.A(
-                className='navbar-item',
-                href='#',
-                children=[
-                    html.Img(src='assets/SNAP_acronym_color.svg')
-                ]
-            )
-        ])
+        html.Div(
+            className='container',
+            children=[
+                html.Div(
+                    className='section',
+                    children=[
+                        html.Div(
+                            className='header--logo',
+                            children=[
+                                html.A(
+                                    className='header--snap-link',
+                                    children=[
+                                        html.Img(src='assets/SNAP.svg')
+                                    ]
+                                )
+                            ]
+                        ),
+                        html.Div(
+                            className='header--titles',
+                            children=[
+                                html.H1(
+                                    'Northwest Territories Climate Scenarios Explorer',
+                                    className='title is-2'
+                                ),
+                                html.H2(
+                                    'See temperature and precipitation projections for selected NWT locations under various climate scenarios, from now until far into the future.',
+                                    className='subtitle is-4'
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
     ]
 )
 
 footer = html.Footer(
-    className='footer',
+    className='footer has-text-centered',
     children=[
         html.Div(
-            className='content has-text-centered',
             children=[
-                dcc.Markdown("""
-This is a page footer, where we'd put legal notes and other items.
-                    """)
+                html.A(
+                    href='https://snap.uaf.edu',
+                    target='_blank',
+                    className='level-item',
+                    children=[
+                        html.Img(
+                            src='assets/SNAP.svg'
+                        )
+                    ]
+                ),
+                html.A(
+                    href='https://uaf.edu/uaf/',
+                    target='_blank',
+                    className='level-item',
+                    children=[
+                        html.Img(
+                            src='assets/UAF.svg'
+                        )
+                    ]
+                ),
+                html.A(
+                    href='https://www.gov.nt.ca/',
+                    target='_blank',
+                    className='level-item',
+                    children=[
+                        html.Img(
+                            src='assets/NWT.svg'
+                        )
+                    ]
+                )
             ]
+        ),
+        dcc.Markdown(
+            """
+This tool is part of an ongoing collaboration between SNAP and the Government of Northwest Territories. We are working to make a wide range of downscaled climate products that are easily accessible, flexibly usable, and fully interpreted and understandable to users in the Northwest Territories, while making these products relevant at a broad geographic scale.
+
+UA is an AA/EO employer and educational institution and prohibits illegal discrimination against any individual. [Statement of Nondiscrimination](https://www.alaska.edu/nondiscrimination/)
+            """,
+            className='content is-size-5'
         )
     ]
 )
@@ -139,9 +201,9 @@ scenarios_checkbox_field = html.Div(
             className='control',
             id='scenario-check',
             options=[
-                {'label':' RCP4.5', 'value':'rcp45'},
-                {'label':' RCP6.0', 'value':'rcp60'},
-                {'label':' RCP8.5', 'value':'rcp85'}
+                {'label':' RCP 4.5', 'value':'rcp45'},
+                {'label':' RCP 6.0', 'value':'rcp60'},
+                {'label':' RCP 8.5', 'value':'rcp85'}
             ],
             values=['rcp85']
         )
@@ -216,50 +278,65 @@ models_field = html.Div(
     ]
 )
 
-form_fields = [
-    html.Div(
-        className='form',
-        children=[
-            minesites_dropdown_field,
-            scenarios_checkbox_field,
-            variable_toggle_field,
-            months_field,
-            models_field,
-            dcc.Graph(id='minesites-map', figure=map_figure, config={'displayModeBar': False})
-        ]
-    )
-]
-
-main_layout = html.Div(
-    className='section',
+form_fields = html.Div(
+    className='columns form',
     children=[
-        html.H1(
-            'Northwest Territories Climate Scenarios Explorer',
-            className='title is-2'
+        html.Div(
+            className='column is-two-thirds',
+            children=[
+                html.H3(
+                    'Step 1: Choose a location using the list or map.',
+                    className='title is-5'
+                ),
+                minesites_dropdown_field,
+                dcc.Graph(
+                    id='minesites-map',
+                    figure=map_figure,
+                    config={
+                        'displayModeBar': False
+                    }
+                )
+            ]
         ),
         html.Div(
-            className='columns',
+            className='column',
             children=[
-                html.Div(
-                    className='column is-one-third',
-                    children=form_fields
+                html.H3(
+                    'Step 2: Choose variables.',
+                    className='title is-5'
                 ),
-                html.Div(
-                    className='column',
-                    children=[
-                        dcc.Graph(id='my-graph'),
-                        dcc.RangeSlider(
-                            id='range-slider',
-                            marks={str(year): str(year)
-                                   for year in df['year'].unique()[::2]},
-                            min=df['year'].min(),
-                            max=df['year'].max(),
-                            step=1,
-                            value=[
-                                df['year'].unique().min(),
-                                df['year'].unique().max()
-                            ]
-                        )
+                scenarios_checkbox_field,
+                variable_toggle_field,
+                months_field,
+                models_field
+            ]
+        )
+    ]
+)
+
+main_layout = html.Div(
+    className='container',
+    children=[
+        html.Div(
+            className='section',
+            children=[
+                form_fields,
+            ]
+        ),
+        html.Div(
+            className='section graph',
+            children=[
+                dcc.Graph(id='my-graph'),
+                dcc.RangeSlider(
+                    id='range-slider',
+                    marks={str(year): str(year)
+                           for year in df['year'].unique()[::2]},
+                    min=df['year'].min(),
+                    max=df['year'].max(),
+                    step=1,
+                    value=[
+                        df['year'].unique().min(),
+                        df['year'].unique().max()
                     ]
                 )
             ]
@@ -268,9 +345,8 @@ main_layout = html.Div(
 )
 
 app.layout = html.Div(
-    className='container',
     children=[
-        navbar,
+        header_section,
         main_layout,
         footer
     ]

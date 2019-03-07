@@ -9,7 +9,41 @@ h1, h2, h3, h4, h5, h6 {
 	font-family: 'Open Sans';
 }
 
+label.label:not(:last-child) {
+	margin: 1.5em 0 1ex;
+}
+
 /* We want vertical Checklists always. */
 .control label.checkbox {
 	display: block;
+}
+
+.header {
+	background-color: rgba(239, 241, 226, 1.00);
+}
+
+.header--logo {
+	width: 6.8em;
+	float: left;
+}
+
+.header--headers {
+	width: 85%;
+}
+
+.header--snap-link img {
+	height: 6.8em;
+}
+
+.form label, .form input {
+	font-size: 130%;
+}
+
+.footer a {
+	display: inline-block;
+}
+
+.footer a img {
+	height: 6.8em;
+	margin: 1em 1.5em;
 }

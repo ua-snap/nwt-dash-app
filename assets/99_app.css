@@ -50,6 +50,13 @@ tspan.line:nth-child(1) {
 	font-size: 18pt;
 }
 
+.rc-slider-handle {
+	width: 25px;
+	height: 25px;
+	margin-left: -15px;
+	margin-top: -11px;
+}
+
 .footer p {
 	width: 50%;
 	margin: 1em auto;
@@ -62,4 +69,8 @@ tspan.line:nth-child(1) {
 .footer a img {
 	height: 6.8em;
 	margin: 1em 1.5em;
+}
+
+._dash-undo-redo {
+	display: none;
 }

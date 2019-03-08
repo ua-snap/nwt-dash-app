@@ -363,6 +363,7 @@ main_layout = html.Div(
             className='section graph',
             children=[
                 dcc.Graph(id='my-graph'),
+                html.H3('Step 3: Adjust date range.', className='title is-5'),
                 dcc.RangeSlider(
                     id='range-slider',
                     marks={i: i for i in range(2000, 2320, 20)},

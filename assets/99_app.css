@@ -39,6 +39,22 @@ label.label:not(:last-child) {
 	font-size: 130%;
 }
 
+label.checkbox input, label.radio input {
+	position: relative;
+	bottom: .1ex;
+	margin-right: .5ex;
+}
+
+tspan.line:nth-child(1) {
+	font-weight: 900;
+	font-size: 18pt;
+}
+
+.footer p {
+	width: 50%;
+	margin: 1em auto;
+}
+
 .footer a {
 	display: inline-block;
 }

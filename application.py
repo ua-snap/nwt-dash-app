@@ -20,7 +20,42 @@ with open('data.pickle', 'rb') as handle:
 df = data[1]['tas']
 pts = pd.read_csv('minesites.csv', index_col=0)
 mapbox_access_token = os.environ['MAPBOX_ACCESS_TOKEN']
-scenarios = ['rcp45', 'rcp60', 'rcp85']
+
+# Lookup tables for a few things used in form inputs & graph title
+variables_lut = {
+    'tas': 'Temperature',
+    'pr': 'Precipitation'
+}
+
+scenarios_lut = {
+    'rcp45': 'RCP 4.5',
+    'rcp60': 'RCP 6.0',
+    'rcp85': 'RCP 8.5',
+}
+
+months_lut = {
+    1: 'January',
+    2: 'February',
+    3: 'March',
+    4: 'April',
+    5: 'May',
+    6: 'June',
+    7: 'July',
+    8: 'August',
+    9: 'September',
+    10: 'October',
+    11: 'November',
+    12: 'December'
+}
+
+models_lut = {
+    'GISS-E2-R': 'GISS-E2-R',
+    'GFDL-CM3': 'GFDL-CM3',
+    '5ModelAvg': 'Five Model Average',
+    'IPSL-CM5A-LR': 'IPSL-CM5A-LR',
+    'MRI-CGCM3': 'MRI-CGCM3',
+    'NCAR-CCSM4': 'NCAR-CCSM4'
+}
 
 map_traces = [
     go.Scattermapbox(
@@ -200,11 +235,14 @@ scenarios_checkbox_field = html.Div(
             labelClassName='checkbox',
             className='control',
             id='scenario-check',
-            options=[
-                {'label':' RCP 4.5', 'value':'rcp45'},
-                {'label':' RCP 6.0', 'value':'rcp60'},
-                {'label':' RCP 8.5', 'value':'rcp85'}
-            ],
+            options=list(
+                map(
+                    lambda k: {
+                        'label': scenarios_lut[k],
+                        'value': k
+                    }, scenarios_lut
+                )
+            ),
             values=['rcp85']
         )
     ]
@@ -218,10 +256,14 @@ variable_toggle_field = html.Div(
             labelClassName='radio',
             className='control',
             id='variable-toggle',
-            options=[
-                {'label': ' Temperature', 'value':'tas'},
-                {'label': ' Precipitation', 'value':'pr'}
-            ],
+            options=list(
+                map(
+                    lambda k: {
+                        'label': variables_lut[k],
+                        'value': k
+                    }, variables_lut
+                )
+            ),
             value='tas'
         )
     ]
@@ -242,20 +284,14 @@ months_field = html.Div(
         html.Div(className='control', children=[
             dcc.Dropdown(
                 id='month-dropdown',
-                options=[
-                    {'label': 'January', 'value': '1'},
-                    {'label': 'February', 'value': '2'},
-                    {'label': 'March', 'value': '3'},
-                    {'label': 'April', 'value': '4'},
-                    {'label': 'May', 'value': '5'},
-                    {'label': 'June', 'value': '6'},
-                    {'label': 'July', 'value': '7'},
-                    {'label': 'August', 'value': '8'},
-                    {'label': 'September', 'value': '9'},
-                    {'label': 'October', 'value': '10'},
-                    {'label': 'November', 'value': '11'},
-                    {'label': 'December', 'value': '12'}
-                ],
+                options=list(
+                    map(
+                        lambda k: {
+                            'label': months_lut[k],
+                            'value': k
+                        }, months_lut
+                    )
+                ),
                 value=[1],
                 multi=True,
                 disabled=False
@@ -329,14 +365,13 @@ main_layout = html.Div(
                 dcc.Graph(id='my-graph'),
                 dcc.RangeSlider(
                     id='range-slider',
-                    marks={str(year): str(year)
-                           for year in df['year'].unique()[::2]},
-                    min=df['year'].min(),
-                    max=df['year'].max(),
-                    step=1,
+                    marks={i: i for i in range(2000, 2320, 20)},
+                    min=2000,
+                    max=2300,
+                    step=20,
                     value=[
-                        df['year'].unique().min(),
-                        df['year'].unique().max()
+                        2000,
+                        2300
                     ]
                 )
             ]
@@ -351,6 +386,32 @@ app.layout = html.Div(
         footer
     ]
 )
+
+def build_plot_title(location, variable, start, end, annual, months, scenarios, models):
+    ''' Return a string containing the map title '''
+    from pprint import pprint
+    pprint(months)
+    def join_strings_with_commas(lut, items):
+        return ', '.join(list(map(lambda k: lut[k], items))).rstrip(', ')
+
+    title = location + '<br>'
+    if annual:
+        title += 'Decadal Annual Mean '
+        months_fragment = ''
+    else:
+        title += 'Decadal Monthly Mean '
+        months.sort()
+        months_fragment = '<br>' +  join_strings_with_commas(months_lut, months)
+
+    title += variables_lut[variable] + ', ' + str(start) + '-' + str(end) + months_fragment
+
+    scenarios.sort()
+    models.sort()
+
+    title += '<br>' + join_strings_with_commas(scenarios_lut, scenarios)
+    title += '<br>' + join_strings_with_commas(models_lut, models)
+
+    return title
 
 def average_months(dff, model, scenario, variable_value):
     '''
@@ -378,7 +439,7 @@ def average_months(dff, model, scenario, variable_value):
 )
 def disable_month_dropdown(values):
     """ Disable months selector when "All months" is selected """
-    return True if values else False
+    return bool(values)
 
 @app.callback(
     Output('minesites-dropdown', 'value'),
@@ -429,6 +490,7 @@ def update_graph(
         dff = cur_df.copy()
 
     begin_range, end_range = year_range
+
     dff = dff[(dff['year'] >= begin_range) & (dff['year'] <= end_range)]
     dff = dff.loc[dff['scenario'].isin(scenario_values), ]
     dff = dff.loc[dff['model'].isin(model_values), ]
@@ -445,22 +507,11 @@ def update_graph(
 
     dff = dff.reset_index(drop=True)
 
-    if 'all' in all_check:
-        title_lu = {
-            'tas': 'Decadal Annual Mean Temperatures',
-            'pr': 'Decadal Annual Mean Precipitation'
-        }
-        title = title_lu[variable_value]
-    else:
-        title_lu = {
-            'tas': 'Decadal Monthly Mean Temperatures',
-            'pr': 'Decadal Monthly Mean Precipitation'
-        }
-        title = title_lu[variable_value]
+    title = build_plot_title(minesite, variable_value, begin_range, end_range, all_check, months, scenario_values, model_values)
 
     yaxis_title = {
         'tas': 'Degrees Celsius',
-        'pr': 'millimeters'
+        'pr': 'Millimeters'
     }
 
     return {
@@ -475,7 +526,7 @@ def update_graph(
         ],
         'layout': {
             'title': title,
-            'xaxis': dict(title='Decades'),
+            'xaxis': dict(title='Year'),
             'yaxis': dict(title=yaxis_title[variable_value])
         }
     }

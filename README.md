@@ -10,7 +10,7 @@ To run the application locally, install [pipenv](https://pipenv.readthedocs.io/e
 ```bash
 cd /path/to/this/repo
 pipenv install
-pipenv run python app.py
+pipenv run python application.py
 ```
 
-The application will be available at http://127.0.0.1:8050/.
+The application will be available at [http://127.0.0.1:8080/](http://127.0.0.1:8080/).

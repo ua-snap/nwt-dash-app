@@ -1,46 +1,76 @@
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700&subset=latin-ext');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin-ext');
+@import url('https://fonts.googleapis.com/css?family=Cardo:400,400i,700&subset=latin-ext');
 
 html, body {
-	font-family: 'Lato';
+	font-family: 'Cardo';
 }
 
-h1, h2, h3, h4 {
-	font-family: 'Lato';
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Open Sans';
 }
 
-img.funders {
-	width: 200px;
+label.label:not(:last-child) {
+	margin: 1.5em 0 1ex;
 }
 
-.column {
-	padding: 0 2ex !important;
+/* We want vertical Checklists always. */
+.control label.checkbox {
+	display: block;
 }
 
-.form--inline {
-	display: inline-block;
-	margin-right: 1em;
+.header {
+	background-color: rgba(239, 241, 226, 1.00);
 }
 
-.form--wrapper {
-	margin-bottom: 1em;
+.header--logo {
+	width: 6.8em;
+	float: left;
 }
 
-.form--inline--text {
-	display: inline-block;
+.header--headers {
+	width: 85%;
+}
+
+.header--snap-link img {
+	height: 6.8em;
+}
+
+.form label, .form input {
+	font-size: 130%;
+}
+
+label.checkbox input, label.radio input {
 	position: relative;
-	top: -1.3ex;
-	margin-left: 1em;
+	bottom: .1ex;
+	margin-right: .5ex;
 }
 
-.region-selector #minesites-dropdown {
+tspan.line:nth-child(1) {
+	font-weight: 900;
+	font-size: 18pt;
+}
+
+.rc-slider-handle {
+	width: 25px;
+	height: 25px;
+	margin-left: -15px;
+	margin-top: -11px;
+}
+
+.footer p {
+	width: 50%;
+	margin: 1em auto;
+}
+
+.footer a {
 	display: inline-block;
-	min-width: 15em;
 }
 
-#minesites-dropdown .Select.is-disabled .Select-value-label {
-	color: #ccc !important;
+.footer a img {
+	height: 6.8em;
+	margin: 1em 1.5em;
 }
 
 ._dash-undo-redo {
-  display: none;
+	display: none;
 }

@@ -120,7 +120,7 @@ header_section = html.Div(
                                 html.A(
                                     className='header--snap-link',
                                     children=[
-                                        html.Img(src='assets/SNAP.svg')
+                                        html.Img(src='assets/SNAP_acronym_color_square.svg')
                                     ]
                                 )
                             ]
@@ -133,7 +133,7 @@ header_section = html.Div(
                                     className='title is-3'
                                 ),
                                 html.H2(
-                                    'See temperature and precipitation projections for selected NWT locations under various climate scenarios, from now until far into the future.',
+                                    'See temperature and precipitation projections for selected NWT locations under various climate scenarios, from now until far into the future.  Choose a location and variables to get started.',
                                     className='subtitle is-5'
                                 )
                             ]

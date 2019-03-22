@@ -163,6 +163,7 @@ def update_graph(
         'layout': {
             'title': title,
             'autosize': False,
+            'showlegend': True,
             'height': 600,
             'margin': dict(t=200, b=100),
             'xaxis': dict(title='Year'),

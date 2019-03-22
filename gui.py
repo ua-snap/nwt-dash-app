@@ -112,7 +112,7 @@ header_section = html.Div(
             className='container',
             children=[
                 html.Div(
-                    className='section',
+                    className='section header--section',
                     children=[
                         html.Div(
                             className='header--logo',
@@ -130,11 +130,11 @@ header_section = html.Div(
                             children=[
                                 html.H1(
                                     'Northwest Territories Climate Scenarios Explorer',
-                                    className='title is-2'
+                                    className='title is-3'
                                 ),
                                 html.H2(
                                     'See temperature and precipitation projections for selected NWT locations under various climate scenarios, from now until far into the future.',
-                                    className='subtitle is-4'
+                                    className='subtitle is-5'
                                 )
                             ]
                         )
@@ -156,7 +156,7 @@ footer = html.Footer(
                     className='level-item',
                     children=[
                         html.Img(
-                            src='assets/SNAP.svg'
+                            src='assets/SNAP_color_all.svg'
                         )
                     ]
                 ),
@@ -311,10 +311,6 @@ form_fields = html.Div(
         html.Div(
             className='column is-two-thirds',
             children=[
-                html.H3(
-                    'Step 1: Choose a location using the list or map.',
-                    className='title is-5'
-                ),
                 communities_dropdown_field,
                 dcc.Graph(
                     id='minesites-map',
@@ -329,10 +325,6 @@ form_fields = html.Div(
         html.Div(
             className='column',
             children=[
-                html.H3(
-                    'Step 2: Choose variables.',
-                    className='title is-5'
-                ),
                 scenarios_checkbox_field,
                 variable_toggle_field,
                 months_field,
@@ -346,7 +338,7 @@ main_layout = html.Div(
     className='container',
     children=[
         html.Div(
-            className='section',
+            className='section section--form',
             children=[
                 form_fields,
             ]
@@ -355,7 +347,6 @@ main_layout = html.Div(
             className='section graph',
             children=[
                 dcc.Graph(id='my-graph'),
-                html.H3('Step 3: Adjust date range.', className='title is-5'),
                 dcc.RangeSlider(
                     id='range-slider',
                     marks={i: i for i in range(2000, 2320, 20)},

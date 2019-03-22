@@ -228,7 +228,7 @@ scenarios_checkbox_field = html.Div(
                     }, scenarios_lut
                 )
             ),
-            values=['rcp85']
+            values=['rcp60', 'rcp85']
         )
     ]
 )
@@ -277,7 +277,7 @@ months_field = html.Div(
                         }, months_lut
                     )
                 ),
-                value=[1],
+                value=[12, 1, 2],
                 multi=True,
                 disabled=False
             )
@@ -299,7 +299,7 @@ models_field = html.Div(
                     }, models_lut
                 )
             ),
-            value=['IPSL-CM5A-LR'],
+            value=['NCAR-CCSM4'],
             multi=True
         )
     ]

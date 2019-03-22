@@ -9,7 +9,16 @@ from dash.dependencies import Input, Output
 import pandas as pd
 from gui import layout, months_lut, variables_lut, models_lut, scenarios_lut, ms_colors
 
+# Read pickled data blob
 data = pd.read_pickle('data.pickle')
+
+# Google Analytics; script snipped is in gui.py
+external_scripts = [
+    {
+        'src': 'https://www.googletagmanager.com/gtag/js?id=UA-3978613-12',
+        'async': 'async'
+    }
+]
 
 app = dash.Dash(__name__)
 # AWS Elastic Beanstalk looks for application by default,

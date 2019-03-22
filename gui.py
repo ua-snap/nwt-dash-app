@@ -12,6 +12,9 @@ import pandas as pd
 communities = pd.read_pickle('community_places.pickle')
 mapbox_access_token = os.environ['MAPBOX_ACCESS_TOKEN']
 
+# Google analytics tag
+gtag_id = os.environ['GTAG_ID']
+
 # Lookup tables for a few things used in form inputs & graph title
 variables_lut = {
     'tas': 'Temperature',
@@ -100,6 +103,17 @@ ms_colors = {
     'MRI-CGCM3': {'rcp45': '#4863A0', 'rcp60': '#2B547E', 'rcp85': '#151B54'},
     'NCAR-CCSM4': {'rcp45': '#C35817', 'rcp60': '#6F4E37', 'rcp85': '#493D26'}
 }
+
+# Google Analytics script fragment,
+# Set GTAG_ID in environment
+analytics_script = html.Script(f'''
+<!-- Global site tag (gtag.js) - Google Analytics -->
+window.dataLayer = window.dataLayer || [];
+function gtag(){{dataLayer.push(arguments);}}
+gtag('js', new Date());
+gtag('config', '{gtag_id}');
+</script>
+''')
 
 # We want this HTML structure to get the full-width background color:
 # <div class="header">
@@ -367,6 +381,7 @@ layout = html.Div(
     children=[
         header_section,
         main_layout,
-        footer
+        footer,
+        analytics_script
     ]
 )

@@ -164,8 +164,8 @@ def update_graph(
             'title': title,
             'autosize': False,
             'showlegend': True,
-            'height': 600,
-            'margin': dict(t=200, b=100),
+            'height': 500,
+            'margin': dict(t=100, b=50),
             'xaxis': dict(title='Year'),
             'yaxis': dict(title=yaxis_title[variable_value])
         }

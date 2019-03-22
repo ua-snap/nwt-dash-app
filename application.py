@@ -36,12 +36,6 @@ def build_plot_title(location, variable, start, end, annual, months, scenarios, 
 
     title += variables_lut[variable] + ', ' + str(start) + '-' + str(end) + months_fragment
 
-    scenarios.sort()
-    models.sort()
-
-    title += '<br>' + join_strings_with_commas(scenarios_lut, scenarios)
-    title += '<br>' + join_strings_with_commas(models_lut, models)
-
     return title
 
 def average_months(dff, model, scenario, variable_value):

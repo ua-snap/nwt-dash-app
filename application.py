@@ -20,7 +20,7 @@ external_scripts = [
     }
 ]
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, external_scripts=external_scripts)
 # AWS Elastic Beanstalk looks for application by default,
 # if this variable (application) isn't set you will get a WSGI error.
 application = app.server

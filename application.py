@@ -53,6 +53,12 @@ def average_months(dff, model, scenario, variable_value):
 
     # convert back to a DataFrame from the output Series...
     dfm = dfm.to_frame(name=variable_value).reset_index(drop=True)
+
+    # Round to one digit
+    dfm[variable_value] = dfm[variable_value].apply(
+        lambda x: round(x, 1)
+    )
+
     dfm['year'] = sub_df['year'].unique()
     dfm['model'] = model
     dfm['scenario'] = scenario

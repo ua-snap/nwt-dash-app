@@ -30,7 +30,7 @@ application = app.server
 # The next config sets a relative base path so we can deploy
 # with custom URLs.
 # https://community.plot.ly/t/dash-error-loading-layout/8139/6
-app.config.url_base_pathname = os.environ['REQUESTS_PATHNAME_PREFIX']
+app.config.requests_pathname_prefix = os.environ['REQUESTS_PATHNAME_PREFIX']
 
 app.title = 'NWT Climate Scenarios Explorer'
 app.layout = layout

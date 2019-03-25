@@ -11,6 +11,7 @@ import pandas as pd
 
 communities = pd.read_pickle('community_places.pickle')
 mapbox_access_token = os.environ['MAPBOX_ACCESS_TOKEN']
+path_prefix = os.environ['REQUESTS_PATHNAME_PREFIX']
 
 # Google analytics tag
 gtag_id = os.environ['GTAG_ID']
@@ -134,7 +135,7 @@ header_section = html.Div(
                                 html.A(
                                     className='header--snap-link',
                                     children=[
-                                        html.Img(src='assets/SNAP_acronym_color_square.svg')
+                                        html.Img(src=path_prefix + 'assets/SNAP_acronym_color_square.svg')
                                     ]
                                 )
                             ]
@@ -170,7 +171,7 @@ footer = html.Footer(
                     className='level-item',
                     children=[
                         html.Img(
-                            src='assets/SNAP_color_all.svg'
+                            src=path_prefix + 'assets/SNAP_color_all.svg'
                         )
                     ]
                 ),
@@ -180,7 +181,7 @@ footer = html.Footer(
                     className='level-item',
                     children=[
                         html.Img(
-                            src='assets/UAF.svg'
+                            src=path_prefix + 'assets/UAF.svg'
                         )
                     ]
                 ),
@@ -190,7 +191,7 @@ footer = html.Footer(
                     className='level-item',
                     children=[
                         html.Img(
-                            src='assets/NWT.svg'
+                            src=path_prefix + 'assets/NWT.svg'
                         )
                     ]
                 )

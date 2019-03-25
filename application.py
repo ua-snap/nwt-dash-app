@@ -2,6 +2,7 @@
 NWT Mine site future climate tool
 """
 # pylint: disable=invalid-name, import-error, line-too-long, too-many-arguments
+import os
 import itertools
 import plotly.graph_objs as go
 import dash
@@ -20,10 +21,17 @@ external_scripts = [
     }
 ]
 
-app = dash.Dash(__name__, external_scripts=external_scripts)
+app = dash.Dash(__name__, debug=True, external_scripts=external_scripts)
+
 # AWS Elastic Beanstalk looks for application by default,
 # if this variable (application) isn't set you will get a WSGI error.
 application = app.server
+
+# The next config sets a relative base path so we can deploy
+# with custom URLs.
+# https://community.plot.ly/t/dash-error-loading-layout/8139/6
+app.config.url_base_pathname = os.environ['REQUESTS_PATHNAME_PREFIX']
+
 app.title = 'NWT Climate Scenarios Explorer'
 app.layout = layout
 

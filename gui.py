@@ -22,10 +22,12 @@ variables_lut = {
     'pr': 'Precipitation'
 }
 
+# Spaces after are to address a padding issue in the legend
+# for PNG download
 scenarios_lut = {
-    'rcp45': '4.5 Scenarios',
-    'rcp60': '6.0 Scenarios',
-    'rcp85': '8.5 Scenarios',
+    'rcp45': '4.5 Scenarios    ',
+    'rcp60': '6.0 Scenarios    ',
+    'rcp85': '8.5 Scenarios    ',
 }
 
 months_lut = {
@@ -348,7 +350,27 @@ main_layout = html.Div(
         html.Div(
             className='section graph',
             children=[
-                dcc.Graph(id='my-graph'),
+                dcc.Graph(
+                    id='my-graph',
+                    config={
+                        'toImageButtonOptions': {
+                            'title': 'Export to PNG',
+                            'format': 'png',
+                            'filename': 'CommunityChart',
+                            'height': 600,
+                            'width': 1600,
+                            'scale': 1
+                        },
+                        'modeBarButtonsToRemove': [
+                            'zoom2d',
+                            'sendToCloud',
+                            'pan2d',
+                            'select2d',
+                            'lasso2d',
+                            'toggleSpikeLines'
+                        ]
+                    }
+                ),
                 html.Div(
                     className='form date-range-selector',
                     children=[

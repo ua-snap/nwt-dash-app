@@ -238,10 +238,27 @@ def update_graph(
             'title': title,
             'autosize': False,
             'showlegend': True,
-            'height': 500,
-            'margin': dict(t=100, b=50),
+            'height': 650,
+            'margin': dict(t=100, b=130),
             'xaxis': dict(title='Year'),
-            'yaxis': dict(title=yaxis_title[variable_value])
+            'yaxis': dict(title=yaxis_title[variable_value]),
+            'annotations': [
+                {
+                    'x': 0.5,
+                    'y': -0.20,
+                    'xref': 'paper',
+                    'yref': 'paper',
+                    'showarrow': False,
+                    'text': 'These plots are useful for examining possible trends over time, rather than for precisely predicting values.'
+                },
+                {
+                    'x': 0.5,
+                    'y': -0.24,
+                    'xref': 'paper',
+                    'yref': 'paper',
+                    'showarrow': False,
+                    'text': 'Credit: Scenarios Network for Alaska + Arctic Planning, University of Alaska Fairbanks.'
+                }],
         }
     }
 

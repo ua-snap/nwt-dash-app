@@ -13,15 +13,7 @@ from gui import layout, months_lut, variables_lut, models_lut, scenarios_lut, ms
 # Read pickled data blob
 data = pd.read_pickle('data.pickle')
 
-# Google Analytics; script snipped is in gui.py
-external_scripts = [
-    {
-        'src': 'https://www.googletagmanager.com/gtag/js?id=UA-3978613-12',
-        'async': 'async'
-    }
-]
-
-app = dash.Dash(__name__, debug=True, external_scripts=external_scripts)
+app = dash.Dash(__name__)
 
 # AWS Elastic Beanstalk looks for application by default,
 # if this variable (application) isn't set you will get a WSGI error.
@@ -31,6 +23,37 @@ application = app.server
 # with custom URLs.
 # https://community.plot.ly/t/dash-error-loading-layout/8139/6
 app.config.requests_pathname_prefix = os.environ['REQUESTS_PATHNAME_PREFIX']
+
+# Customize this layout to include Google Analytics
+gtag_id = os.environ['GTAG_ID']
+app.index_string = f'''
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3978613-12"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){{dataLayer.push(arguments);}}
+          gtag('js', new Date());
+
+          gtag('config', '{gtag_id}');
+        </script>
+        {{%metas%}}
+        <title>{{%title%}}</title>
+        {{%favicon%}}
+        {{%css%}}
+    </head>
+    <body>
+        {{%app_entry%}}
+        <footer>
+            {{%config%}}
+            {{%scripts%}}
+            {{%renderer%}}
+        </footer>
+    </body>
+</html>
+'''
 
 app.title = 'NWT Climate Scenarios Explorer'
 app.layout = layout

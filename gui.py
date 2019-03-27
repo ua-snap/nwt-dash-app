@@ -105,17 +105,6 @@ ms_colors = {
     'NCAR-CCSM4': {'rcp45': '#C35817', 'rcp60': '#6F4E37', 'rcp85': '#493D26'}
 }
 
-# Google Analytics script fragment,
-# Set GTAG_ID in environment
-analytics_script = html.Script(f'''
-<!-- Global site tag (gtag.js) - Google Analytics -->
-window.dataLayer = window.dataLayer || [];
-function gtag(){{dataLayer.push(arguments);}}
-gtag('js', new Date());
-gtag('config', '{gtag_id}');
-</script>
-''')
-
 # We want this HTML structure to get the full-width background color:
 # <div class="header">
 #   <div class="container"> gives us the centered column
@@ -382,7 +371,6 @@ layout = html.Div(
     children=[
         header_section,
         main_layout,
-        footer,
-        analytics_script
+        footer
     ]
 )

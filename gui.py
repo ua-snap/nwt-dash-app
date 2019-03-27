@@ -388,10 +388,9 @@ RCPs describe paths to future climates based on atmospheric greenhouse gas conce
 
 The four RCP values of 2.6, 4.5, 6.0, and 8.5 indicate projected radiative forcing values—the difference between solar energy absorbed by Earth vs. energy radiated back to space— measured in watts per square meter. RCP X projects that in 2100 the concentration of greenhouse gases will be such that each square meter of Earth will absorb X times more solar energy than it did in 1750.
 
-* RCP 2.6—SNAP does not consider this pathway (emissions peak 2010–2020 and then decline) because it is unrealistic in light of current global emissions.
-* RCP 4.5—SNAP’s “low” scenario. Assumes that new technologies and socioeconomic strategies cause emissions to peak in 2040 and radiative forcing to stabilize after 2100.
-* RCP 6.0—SNAP’s “medium” scenario. Assumes that emissions peak in 2080 and radiative forcing stabilizes after 2100.
-* RCP 8.5—SNAP’s “high” scenario. Emissions increase through the 21st century.
+ * RCP 4.5 — “low” scenario. Assumes that new technologies and socioeconomic strategies cause emissions to peak in 2040 and radiative forcing to stabilize after 2100.
+ * RCP 6.0 — “medium” scenario. Assumes that emissions peak in 2080 and radiative forcing stabilizes after 2100.
+ * RCP 8.5 — “high” scenario. Emissions increase through the 21st century.
 
 ### Extended Concentration Pathways (ECPs)
 

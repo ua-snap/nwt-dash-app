@@ -367,10 +367,43 @@ main_layout = html.Div(
     ]
 )
 
+help_text = html.Div(
+    className='container',
+    children=[
+        html.Div(
+            className='section',
+            children=[
+                dcc.Markdown('''
+
+## Climate scenarios
+
+### Representative Concentration Pathways
+
+RCPs describe paths to future climates based on atmospheric greenhouse gas concentrations. They represent four climate futures—scenarios—extrapolated out to the year 2100, based on a range of possible future human behaviors. RCPs provide a basis for comparison and a “common language” for modelers to share their work.
+
+The four RCP values of 2.6, 4.5, 6.0, and 8.5 indicate projected radiative forcing values—the difference between solar energy absorbed by Earth vs. energy radiated back to space— measured in watts per square meter. RCP X projects that in 2100 the concentration of greenhouse gases will be such that each square meter of Earth will absorb X times more solar energy than it did in 1750.
+
+* RCP 2.6—SNAP does not consider this pathway (emissions peak 2010–2020 and then decline) because it is unrealistic in light of current global emissions.
+* RCP 4.5—SNAP’s “low” scenario. Assumes that emissions peak in 2040 and radiative forcing stabilizes after 2100. 
+* RCP 6.0—SNAP’s “medium” scenario. Assumes that new technologies and socioeconomic strategies cause emissions to peak in 2080 and radiative forcing to stabilize after 2100.
+* RCP 8.5—SNAP’s “high” scenario. Emissions increase through the 21st century.
+
+### Extended Concentration Pathways (ECPs)
+
+These scenarios allow extensions of RCPs for 2100–2500 by expanding the data series for greenhouse gas and land use. ECPs are intended to provide rough estimations of what climate and ocean systems might look like in a few centuries regardless of the driving forces of emissions (demography, policies, technology, and investment).
+
+
+                ''', className='is-size-5 content')
+            ]
+        )
+    ]
+)
+
 layout = html.Div(
     children=[
         header_section,
         main_layout,
+        help_text,
         footer
     ]
 )

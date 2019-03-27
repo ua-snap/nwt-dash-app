@@ -23,9 +23,9 @@ variables_lut = {
 }
 
 scenarios_lut = {
-    'rcp45': 'RCP 4.5',
-    'rcp60': 'RCP 6.0',
-    'rcp85': 'RCP 8.5',
+    'rcp45': '4.5 Scenarios',
+    'rcp60': '6.0 Scenarios',
+    'rcp85': '8.5 Scenarios',
 }
 
 months_lut = {
@@ -217,7 +217,7 @@ communities_dropdown_field = html.Div(
 scenarios_checkbox_field = html.Div(
     className='field',
     children=[
-        html.Label('Scenario(s)', className='label'),
+        html.Label('Scenarios', className='label'),
         dcc.Checklist(
             labelClassName='checkbox',
             className='control',

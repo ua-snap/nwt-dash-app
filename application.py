@@ -3,15 +3,18 @@ NWT Mine site future climate tool
 """
 # pylint: disable=invalid-name, import-error, line-too-long, too-many-arguments
 import os
+import json
 import itertools
 import plotly.graph_objs as go
 import dash
 from dash.dependencies import Input, Output
 import pandas as pd
-from gui import layout, months_lut, variables_lut, models_lut, scenarios_lut, ms_colors
+from gui import layout, map_layout, map_communities_trace, months_lut, variables_lut, models_lut, scenarios_lut, ms_colors
 
-# Read pickled data blob
+# Read pickled data blobs and other items used from env
 data = pd.read_pickle('data.pickle')
+communities = pd.read_pickle('community_places.pickle')
+mapbox_access_token = os.environ['MAPBOX_ACCESS_TOKEN']
 
 app = dash.Dash(__name__)
 
@@ -122,11 +125,42 @@ def disable_month_dropdown(values):
 )
 def update_mine_site_dropdown(selected_on_map):
     """ If user clicks on the map, update the drop down. """
-     # if "territory-wide" is checked, ignore map clicks
+
+    # if "territory-wide" is checked, ignore map clicks
     if selected_on_map is not None:
         return selected_on_map['points'][0]['text']
     # Return a default
     return 'Aklavik'
+
+@app.callback(
+    Output('minesites-map', 'figure'),
+    [
+        Input('communities-dropdown', 'value')
+    ]
+)
+def update_selected_community_on_map(community):
+    """ Draw a second trace on the map with one community highlighted. """
+    return {
+        'data': [
+            map_communities_trace,
+            go.Scattermapbox(
+                lat=[communities.loc[community]['latitude']],
+                lon=[communities.loc[community]['longitude']],
+                mode='markers',
+                marker={
+                    'size': 20,
+                    'color': 'rgb(207, 38, 47)'
+                },
+                line={
+                    'color': 'rgb(0, 0, 0)',
+                    'width': 2
+                },
+                text=community,
+                hoverinfo='text'
+            )
+        ],
+        'layout': map_layout
+    }
 
 @app.callback(
     Output('my-graph', 'figure'),

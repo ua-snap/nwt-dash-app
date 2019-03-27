@@ -52,23 +52,21 @@ models_lut = {
     'NCAR-CCSM4': 'NCAR-CCSM4'
 }
 
-map_traces = [
-    go.Scattermapbox(
-        lat=communities.loc[:, 'latitude'],
-        lon=communities.loc[:, 'longitude'],
-        mode='markers',
-        marker={
-            'size': 15,
-            'color': 'rgb(140,86,75)'
-        },
-        line={
-            'color': 'rgb(0, 0, 0)',
-            'width': 2
-        },
-        text=communities.index,
-        hoverinfo='text'
-    )
-]
+map_communities_trace = go.Scattermapbox(
+    lat=communities.loc[:, 'latitude'],
+    lon=communities.loc[:, 'longitude'],
+    mode='markers',
+    marker={
+        'size': 15,
+        'color': 'rgb(80,80,80)'
+    },
+    line={
+        'color': 'rgb(0, 0, 0)',
+        'width': 2
+    },
+    text=communities.index,
+    hoverinfo='text'
+)
 
 map_layout = go.Layout(
     autosize=True,
@@ -82,7 +80,7 @@ map_layout = go.Layout(
                 sourcetype='geojson',
                 source=json.loads(open('./NorthwestTerritories_4326.geojson', 'r').read()),
                 type='fill',
-                color='rgba(255,0,0,0.1)'
+                color='rgba(255,255,255,.1)'
             )
         ]
     ),
@@ -91,7 +89,7 @@ map_layout = go.Layout(
 )
 
 map_figure = go.Figure({
-    'data': map_traces,
+    'data': [map_communities_trace],
     'layout': map_layout
 })
 

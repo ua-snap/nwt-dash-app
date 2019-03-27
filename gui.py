@@ -349,15 +349,22 @@ main_layout = html.Div(
             className='section graph',
             children=[
                 dcc.Graph(id='my-graph'),
-                dcc.RangeSlider(
-                    id='range-slider',
-                    marks={i: i for i in range(2000, 2320, 20)},
-                    min=2000,
-                    max=2300,
-                    step=20,
-                    value=[
-                        2000,
-                        2300
+                html.Div(
+                    className='form date-range-selector',
+                    children=[
+                        html.Label('Date range', className='label'),
+                        dcc.RangeSlider(
+                            className='control',
+                            id='range-slider',
+                            marks={i: i for i in range(2000, 2320, 20)},
+                            min=2000,
+                            max=2300,
+                            step=20,
+                            value=[
+                                2000,
+                                2300
+                            ]
+                        )
                     ]
                 )
             ]

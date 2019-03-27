@@ -60,6 +60,10 @@ tspan.line:nth-child(1) {
 	font-size: 18pt;
 }
 
+.date-range-selector .rc-slider {
+	margin: 2rem 1rem;
+}
+
 .rc-slider-handle {
 	width: 25px;
 	height: 25px;

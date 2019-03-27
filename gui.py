@@ -192,7 +192,7 @@ This tool is part of an ongoing collaboration between SNAP and the Government of
 
 UA is an AA/EO employer and educational institution and prohibits illegal discrimination against any individual. [Statement of Nondiscrimination](https://www.alaska.edu/nondiscrimination/)
             """,
-            className='content is-size-5'
+            className='content is-size-6'
         )
     ]
 )

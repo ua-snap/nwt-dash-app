@@ -217,7 +217,7 @@ communities_dropdown_field = html.Div(
 scenarios_checkbox_field = html.Div(
     className='field',
     children=[
-        html.Label('Scenarios', className='label'),
+        html.Label('Scenarios (RCPs and ECPs)', className='label'),
         dcc.Checklist(
             labelClassName='checkbox',
             className='control',

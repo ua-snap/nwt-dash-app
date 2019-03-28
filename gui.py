@@ -25,9 +25,9 @@ variables_lut = {
 # Spaces after are to address a padding issue in the legend
 # for PNG download
 scenarios_lut = {
-    'rcp45': '4.5 Scenarios    ',
-    'rcp60': '6.0 Scenarios    ',
-    'rcp85': '8.5 Scenarios    ',
+    'rcp45': '4.5 Scenario    ',
+    'rcp60': '6.0 Scenario    ',
+    'rcp85': '8.5 Scenario    ',
 }
 
 months_lut = {
@@ -133,11 +133,11 @@ header_section = html.Div(
                             className='header--titles',
                             children=[
                                 html.H1(
-                                    'Northwest Territories Climate Scenarios Explorer',
+                                    'Northwest Territories Climate Explorer',
                                     className='title is-3'
                                 ),
                                 html.H2(
-                                    'See temperature and precipitation projections for selected NWT locations under various climate scenarios, from now until far into the future.  Choose a location and variables to get started.',
+                                    'See climate projections for NWT locations under different scenarios.  Choose a location and variables to get started.',
                                     className='subtitle is-5'
                                 )
                             ]
@@ -219,7 +219,7 @@ communities_dropdown_field = html.Div(
 scenarios_checkbox_field = html.Div(
     className='field',
     children=[
-        html.Label('Scenarios (RCPs and ECPs)', className='label'),
+        html.Label('Scenarios (RCPs/ECPs)', className='label'),
         dcc.Checklist(
             labelClassName='checkbox',
             className='control',
@@ -329,10 +329,10 @@ form_fields = html.Div(
         html.Div(
             className='column',
             children=[
-                scenarios_checkbox_field,
                 variable_toggle_field,
                 months_field,
-                models_field
+                models_field,
+                scenarios_checkbox_field
             ]
         )
     ]

@@ -7,12 +7,22 @@ To run the application locally, install [pipenv](https://pipenv.readthedocs.io/e
 ```bash
 cd /path/to/this/repo
 pipenv install
+export GTAG_ID='abc' # google analytics ID, nonce for dev
+export REQUESTS_PATHNAME_PREFIX='/' # see below for more info
 pipenv run python application.py
 ```
 
 The application will be available at [http://127.0.0.1:8080/](http://127.0.0.1:8080/).
 
 ## Deployment on AWS
+
+Before deploying, update the `requirements.txt` file:
+
+```sh
+pipenv clean
+pipenv run pip freeze > requirements.txt
+git commit -am'updating requirements.txt'
+```
 
 When deploying on AWS Elastic Beanstalk, a few environment variables must be set:
 

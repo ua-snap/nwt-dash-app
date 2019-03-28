@@ -45,6 +45,12 @@ label.label:not(:last-child) {
 	padding-right: 2rem;
 }
 
+.header--snap-link a {
+	height: 5.4em;
+	display: block;
+	z-index: 1000;
+}
+
 .header--snap-link img {
 	height: 5.4em;
 }

@@ -36,6 +36,10 @@ label.label:not(:last-child) {
 	margin-top: -1rem;
 }
 
+.header--section h1 {
+	padding-top: .8rem;
+}
+
 .header--logo {
 	float: left;
 	padding-right: 2rem;

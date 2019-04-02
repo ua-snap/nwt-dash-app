@@ -1,6 +1,6 @@
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-# extract point profiles from SNAP 2km data -- output as decadal means
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# extract point profiles from SNAP 2km Far-Futures data -- output as decadal means
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 def list_data( path ):
 	l = glob.glob(os.path.join( path, '*.tif' ))

@@ -13,6 +13,15 @@ label.label:not(:last-child) {
 	margin: 1.5em 0 1ex;
 }
 
+.section--form {
+	padding-top: 0;
+	margin-bottom: 0;
+}
+.section.graph {
+	padding-top: 0;
+	margin-top: -3rem;
+}
+
 /* We want vertical Checklists always. */
 .control label.checkbox {
 	display: block;
@@ -20,19 +29,30 @@ label.label:not(:last-child) {
 
 .header {
 	background-color: rgba(239, 241, 226, 1.00);
+	padding: 0;
+}
+
+.header--section {
+	margin-top: -1rem;
+}
+
+.header--section h1 {
+	padding-top: .8rem;
 }
 
 .header--logo {
-	width: 6.8em;
 	float: left;
+	padding-right: 2rem;
 }
 
-.header--headers {
-	width: 85%;
+.header--snap-link a {
+	height: 5.4em;
+	display: block;
+	z-index: 1000;
 }
 
 .header--snap-link img {
-	height: 6.8em;
+	height: 5.4em;
 }
 
 .form label, .form input {
@@ -48,6 +68,10 @@ label.checkbox input, label.radio input {
 tspan.line:nth-child(1) {
 	font-weight: 900;
 	font-size: 18pt;
+}
+
+.date-range-selector .rc-slider {
+	margin: 2rem 1rem;
 }
 
 .rc-slider-handle {
@@ -67,7 +91,7 @@ tspan.line:nth-child(1) {
 }
 
 .footer a img {
-	height: 6.8em;
+	height: 5em;
 	margin: 1em 1.5em;
 }
 

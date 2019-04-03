@@ -1,48 +1,39 @@
 """
 Take melted data and produce a binary pickle to be use by the Dash app.
 """
+# pylint: disable=invalid-name, import-error
+
 import os
 from collections import defaultdict
 import pickle
 import pandas as pd
 
-# # APP INPUT DATA
 files = [
-    'tas_minesites_decadal_monthly_mean_alldata_melted.csv',
-    'tas_fulldomain_decadal_monthly_mean_alldata_melted.csv',
-    'pr_minesites_decadal_monthly_mean_alldata_melted.csv',
-    'pr_fulldomain_decadal_monthly_mean_alldata_melted.csv'
+    'data/tas_pr_nwt_decadal_mean_historical_melted.csv',
+    'data/tas_pr_nwt_decadal_mean_rcp45_melted.csv',
+    'data/tas_pr_nwt_decadal_mean_rcp60_melted.csv',
+    'data/tas_pr_nwt_decadal_mean_rcp85_melted.csv',
 ]
 
-files = [os.path.join('.', 'data', fn) for fn in files]
-
+# Create dictionary of data frames, in the format
+# rcp45: [dataframe from csv]
 data = {
-    '_'.join(
-        os.path.basename(fn).split('_')[
-            :2]): pd.read_csv(
-                fn,
-                index_col=0) for count,
-    fn in enumerate(files)}
+    '_'.join(os.path.basename(file).split('_')[5:6]):
+        pd.read_csv(
+            file,
+            index_col=0
+        )
+    for file in files
+}
 
-# make sure we only have the years with full decades... this is kinda tricky...
-filtered_data = defaultdict(dict)
-domain_lu = {'minesites': 1, 'fulldomain': 2}
-for k, v in data.items():
-    variable, domain = k.split('_')
-    print(variable)
-    out = []
-    for i, df in v.groupby(['model', 'scenario']):
-        if df['year'].max() > 2100:
-            out.append(df[df['year'] <= 2290])
-        else:
-            out.append(df[df['year'] <= 2090])
+output_data = pd.concat(
+    [
+        data['historical'],
+        data['rcp45'],
+        data['rcp60'],
+        data['rcp85']
+    ],
+    ignore_index=True
+)
 
-    filtered_data[domain_lu[domain]][variable] = pd.concat(out)
-
-del df, data
-
-# welcome to the wild west folks!!! :(
-data = filtered_data  # ugly
-
-with open('data.pickle', 'wb') as handle:
-    pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+output_data.to_pickle('data.pickle')

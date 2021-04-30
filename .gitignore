@@ -7,3 +7,4 @@ venv
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 *.ipynb_checkpoints
+*.ipynb

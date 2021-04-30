@@ -2,6 +2,8 @@ A simple Dash application to examine CMIP5 downscaled climate model outputs over
 
 All work is funded through SNAP at the University of Alaska, Fairbanks.
 
+To extract the data for NWT locations, run `data_prep/extract_profile_snap_deltadownscaled_rasters.py` on Atlas. The `data.pickle` file should be generated locally with `make_pickle.py` after the extraction is complete.
+
 To run the application locally, install [pipenv](https://pipenv.readthedocs.io/en/latest/).  This app needs `python3` to run; if that's not your default python, adjust the command below (i.e. `python3` instead of `python`).
 
 ```bash
@@ -9,6 +11,7 @@ cd /path/to/this/repo
 pipenv install
 export GTAG_ID='abc' # google analytics ID, nonce for dev
 export REQUESTS_PATHNAME_PREFIX='/' # see below for more info
+export MAPBOX_ACCESS_TOKEN='' # <-- insert a valid mapbox token here
 pipenv run python application.py
 ```
 

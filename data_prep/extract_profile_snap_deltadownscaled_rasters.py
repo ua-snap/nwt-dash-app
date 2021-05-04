@@ -81,26 +81,17 @@ if __name__ == '__main__':
 	from functools import partial
 	
 	base_path = '/workspace/Shared/Tech_Projects/DeltaDownscaling/project_data/downscaled_10min'
-	output_path = '/workspace/Shared/Tech_Projects/NWT_CommCharts_MinesApp/project_data/communities_extracted'
+	output_path = '../data'
 	ncpus = 63
-	communities_fn = '/workspace/Shared/Tech_Projects/NWT_CommCharts_MinesApp/project_data/SNAP_comm_charts_export_20160926_fix_021119.csv'
-	minesites_fn = '/workspace/Shared/Tech_Projects/NWT_CommCharts_MinesApp/project_data/minesites.csv'
 	
 	models = ['5ModelAvg','GFDL-CM3','GISS-E2-R','IPSL-CM5A-LR','MRI-CGCM3','NCAR-CCSM4']
 	scenarios = ['historical','rcp45','rcp60','rcp85']
 	variables = ['tas','pr']
 
 	# prepare the points for use in extraction of profiles
-	communities = pd.read_csv( communities_fn )
-	communities = communities[communities.region == 'Northwest Territories']
-	minesites = pd.read_csv( minesites_fn )
-
-	# get the unique points values to use in extractions
-	lonlats = communities.groupby('community').first()[['latitude','longitude']]
-	lonlats_mines = minesites[['Latitude', 'Longitude']]
-	lonlats_mines.index = minesites['Name']
-	lonlats_mines.columns = ['latitude','longitude']
-	lonlats = pd.concat([lonlats, lonlats_mines])
+	communities = pd.read_csv('nwt_point_locations.csv')
+	communities.rename(columns={'name':'community'}, inplace=True)
+	communities.index = communities['community'] 
 
 	# lets make some arguments to use in processing
 	args = []
@@ -117,7 +108,7 @@ if __name__ == '__main__':
 		meta = tmp.meta
 
 	# compute row col locations
-	projected_pts = lonlats.apply(lambda x: pyproj.Proj(init='EPSG:3338')(x.longitude,x.latitude), axis=1)
+	projected_pts = communities.apply(lambda x: pyproj.Proj('EPSG:3338')(x.longitude,x.latitude), axis=1)
 	rowcols = projected_pts.apply(lambda x: get_rowcol_from_point( x[0], x[1], transform=meta['transform']) )
 	
 	# update the args with the rowcols

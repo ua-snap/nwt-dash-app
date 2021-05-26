@@ -109,7 +109,7 @@ def average_months(dff, model, scenario, variable_value):
 
 
 @app.callback(
-    Output("month-dropdown", "disabled"), [Input("all-month-check", "values")]
+    Output("month-dropdown", "disabled"), [Input("all-month-check", "value")]
 )
 def disable_month_dropdown(values):
     """ Disable months selector when "All months" is selected """
@@ -124,7 +124,9 @@ def update_mine_site_dropdown(selected_on_map):
 
     # if "territory-wide" is checked, ignore map clicks
     if selected_on_map is not None:
-        return selected_on_map["points"][0]["text"]
+        community_name = selected_on_map["points"][0]["text"]
+        community_loc = luts.communities[luts.communities['name'] == community_name].index[0]
+        return community_loc
     # Return a default
     return 45
 
@@ -143,7 +145,7 @@ def update_selected_community_on_map(community):
                 mode="markers",
                 marker={"size": 20, "color": "rgb(207, 38, 47)"},
                 line={"color": "rgb(0, 0, 0)", "width": 2},
-                text=community,
+                text=luts.communities.loc[community]["name"],
                 hoverinfo="text",
             ),
         ],
@@ -186,6 +188,8 @@ def update_graph(
         return None
 
     # Subset community, scenarios, and models
+    community_ix = community
+    community = communities.iloc[community].name 
     selected = data[data.community.isin([community])]
     selected = selected[selected.scenario.isin(scenario_values)]
     selected = selected[selected.model.isin(model_values)]
@@ -219,7 +223,7 @@ def update_graph(
     selected = selected.reset_index(drop=True)
 
     title = build_plot_title(
-        luts.communities.loc[community][0],
+        luts.communities.loc[community_ix][0],
         variable_value,
         begin_range,
         end_range,

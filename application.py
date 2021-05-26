@@ -126,7 +126,7 @@ def update_mine_site_dropdown(selected_on_map):
     if selected_on_map is not None:
         return selected_on_map["points"][0]["text"]
     # Return a default
-    return "Aklavik"
+    return 45
 
 
 @app.callback(
@@ -219,7 +219,7 @@ def update_graph(
     selected = selected.reset_index(drop=True)
 
     title = build_plot_title(
-        community,
+        luts.communities.loc[community][0],
         variable_value,
         begin_range,
         end_range,

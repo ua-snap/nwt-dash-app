@@ -64,6 +64,9 @@ ms_colors = {
 # from luts import scenarios_lut, variables_lut, months_lut, models_lut
 
 communities = pd.read_pickle("community_places.pickle")
+communities = communities.reset_index()
+communities = communities.rename(columns={"index": "name"})
+
 print(communities)
 mapbox_access_token = os.environ["MAPBOX_ACCESS_TOKEN"]
 # OLD
@@ -107,7 +110,7 @@ places_trace = go.Scattermapbox(
     mode="markers",
     marker={"size": 10, "color": "rgb(80,80,80)"},
     line={"color": "rgb(0, 0, 0)", "width": 2},
-    text=communities.iloc[:, [0]],
+    text=communities.loc[:, "name"],
     hoverinfo="text",
 )
 

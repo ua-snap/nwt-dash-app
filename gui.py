@@ -2,9 +2,11 @@
 NWT Mine site future climate tool
 """
 # pylint: disable=invalid-name, import-error, line-too-long, too-many-arguments
+from datetime import datetime
 import plotly.graph_objs as go
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_dangerously_set_inner_html as ddsih
 import luts
 
 # Helper functions for GUI.
@@ -48,86 +50,44 @@ map_figure = go.Figure(data=luts.places_trace, layout=luts.map_layout)
 # <div class="header">
 #   <div class="container"> gives us the centered column
 #     <div class="section"> a bit more padding to stay consistent with form
-header_section = html.Div(
-    className="header",
-    children=[
-        html.Div(
-            className="container",
-            children=[
-                html.Div(
-                    className="section header--section",
-                    children=[
-                        html.Div(
-                            className="header--logo",
-                            children=[
-                                html.A(
-                                    className="header--snap-link",
-                                    href="https://snap.uaf.edu",
-                                    rel="external",
-                                    target="_blank",
-                                    children=[
-                                        html.Img(
-                                            src=luts.path_prefix
-                                            + "assets/SNAP_acronym_color_square.svg"
-                                        )
-                                    ],
-                                )
-                            ],
-                        ),
-                        html.Div(
-                            className="header--titles",
-                            children=[
-                                html.H1(
-                                    "Northwest Territories Climate Explorer",
-                                    className="title is-3",
-                                ),
-                                html.H2(
-                                    "See climate projections for NWT locations under different scenarios.  Choose a location and variables to get started.",
-                                    className="subtitle is-5",
-                                ),
-                            ],
-                        ),
-                    ],
-                )
-            ],
-        )
-    ],
+header = ddsih.DangerouslySetInnerHTML(
+    f"""
+<header>
+    <div class="container">
+        <div class="titles">
+            <h1 class="title is-1">Northwest Territories Climate Explorer</h1>
+            <h2 class="subtitle is-2">See climate projections for NWT locations under different scenarios</h2>
+        </div>
+    </div>
+</header>
+"""
 )
 
-footer = html.Footer(
-    className="footer has-text-centered",
-    children=[
-        html.Div(
-            children=[
-                html.A(
-                    href="https://snap.uaf.edu",
-                    target="_blank",
-                    className="level-item",
-                    children=[html.Img(src=luts.path_prefix + "assets/SNAP_color_all.svg")],
-                ),
-                html.A(
-                    href="https://uaf.edu/uaf/",
-                    target="_blank",
-                    className="level-item",
-                    children=[html.Img(src=luts.path_prefix + "assets/UAF.svg")],
-                ),
-                html.A(
-                    href="https://www.gov.nt.ca/",
-                    target="_blank",
-                    className="level-item",
-                    children=[html.Img(src=luts.path_prefix + "assets/NWT.svg")],
-                ),
-            ]
-        ),
-        dcc.Markdown(
-            """
-This tool is part of an ongoing collaboration between SNAP and the Government of Northwest Territories. We are working to make a wide range of downscaled climate products that are easily accessible, flexibly usable, and fully interpreted and understandable to users in the Northwest Territories, while making these products relevant at a broad geographic scale.
-
-UA is an AA/EO employer and educational institution and prohibits illegal discrimination against any individual. [Statement of Nondiscrimination](https://www.alaska.edu/nondiscrimination/)
-            """,
-            className="content is-size-6",
-        ),
-    ],
+current_year = datetime.now().year
+footer = ddsih.DangerouslySetInnerHTML(
+    f"""
+<footer class="footer">
+    <div class="container">
+        <div class="columns">
+            <div class="logos column is-one-fifth">
+                <a href="https://www.gov.nt.ca/">
+                    <img src="{luts.path_prefix}assets/NWT.svg" />
+                </a>
+                <br>
+                <a href="https://uaf.edu/uaf/">
+                    <img src="{luts.path_prefix}assets/UAF.svg" />
+                </a>
+            </div>
+            <div class="column content is-size-5">
+                <p>This tool is part of an ongoing collaboration between SNAP and the Government of Northwest Territories. We are working to make a wide range of downscaled climate products that are easily accessible, flexibly usable, and fully interpreted and understandable to users in the Northwest Territories, while making these products relevant at a broad geographic scale.
+                </p>
+                <p>Copyright &copy; {current_year} University of Alaska Fairbanks.  All rights reserved.</p>
+                <p>UA is an AA/EO employer and educational institution and prohibits illegal discrimination against any individual.  <a href="https://www.alaska.edu/nondiscrimination/">Statement of Nondiscrimination</a> and <a href="https://www.alaska.edu/records/records/compliance/gdpr/ua-privacy-statement/">Privacy Statement</a>.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+"""
 )
 
 communities_dropdown_field = html.Div(
@@ -139,11 +99,8 @@ communities_dropdown_field = html.Div(
             children=[
                 dcc.Dropdown(
                     id="communities-dropdown",
-                    options=[
-                        {"label": i, "value": i}
-                        for i in luts.communities.index
-                    ],
-                    value="Yellowknife",
+                    options=[{"label": community[0], "value": index} for index, community in luts.communities.iterrows()],
+                    value=45, # yellowknife
                 )
             ],
         ),
@@ -159,7 +116,10 @@ scenarios_checkbox_field = html.Div(
             className="control",
             id="scenario-check",
             options=list(
-                map(lambda k: {"label": luts.scenarios_lut[k], "value": k}, luts.scenarios_lut)
+                map(
+                    lambda k: {"label": luts.scenarios_lut[k], "value": k},
+                    luts.scenarios_lut,
+                )
             ),
             value=["rcp60", "rcp85"],
         ),
@@ -175,7 +135,10 @@ variable_toggle_field = html.Div(
             className="control",
             id="variable-toggle",
             options=list(
-                map(lambda k: {"label": luts.variables_lut[k], "value": k}, luts.variables_lut)
+                map(
+                    lambda k: {"label": luts.variables_lut[k], "value": k},
+                    luts.variables_lut,
+                )
             ),
             value="tas",
         ),
@@ -199,7 +162,10 @@ months_field = html.Div(
                 dcc.Dropdown(
                     id="month-dropdown",
                     options=list(
-                        map(lambda k: {"label": luts.months_lut[k], "value": k}, luts.months_lut)
+                        map(
+                            lambda k: {"label": luts.months_lut[k], "value": k},
+                            luts.months_lut,
+                        )
                     ),
                     value=[12, 1, 2],
                     multi=True,
@@ -217,7 +183,9 @@ models_field = html.Div(
         dcc.Dropdown(
             id="model-dropdown",
             options=list(
-                map(lambda k: {"label": luts.models_lut[k], "value": k}, luts.models_lut)
+                map(
+                    lambda k: {"label": luts.models_lut[k], "value": k}, luts.models_lut
+                )
             ),
             value=["NCAR-CCSM4"],
             multi=True,
@@ -338,4 +306,4 @@ These scenarios allow extensions of RCPs for 2100–2300 by expanding the data s
     ],
 )
 
-layout = html.Div(children=[header_section, main_layout, help_text, footer])
+layout = html.Div(children=[header, main_layout, help_text, footer])

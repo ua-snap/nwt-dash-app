@@ -62,7 +62,7 @@ header = ddsih.DangerouslySetInnerHTML(
 </header>
 <section class="introduction section">
     <div class="container content is-size-4">
-        <p>See climate projections&mdash;including very long&ndash;term extrapolations&mdash;for 47 communities in the Northwest Territories of Canada.</p>
+        <p>See climate projections&mdash;including very long&ndash;term extrapolations&mdash;for 46 communities in the Northwest Territories of Canada.</p>
         <p>You can look at each of five different climate models or a model average, choosing only selected months if you wish. For example, you can chart projected precipitation in May and June for Fort McPherson, years 2000&ndash;2300, using a five-model average.</p>
         <p>The tool also explains how different levels of greenhouse gas emissions create the various paths to future climates known as RCPs and ECPs.</p>
         <p class="camera-icon">Click the <span>
@@ -245,14 +245,23 @@ main_layout = wrap_in_section(
                                 "width": 1600,
                                 "scale": 1,
                             },
+
                             "modeBarButtonsToRemove": [
                                 "zoom2d",
+                                "zoomIn2d",
+                                "zoomOut2d",
                                 "sendToCloud",
+                                "autoScale2d",
+                                "resetScale2d",
                                 "pan2d",
                                 "select2d",
+                                "hoverClosestCartesian",
+                                "hoverCompareCartesian",
                                 "lasso2d",
-                                "toggleSpikeLines",
+                                "toggleSpikelines",
                             ],
+                            "scrollZoom": False,
+                            "displaylogo": False,
                         },
                     ),
                     html.Div(

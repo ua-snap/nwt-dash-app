@@ -109,52 +109,50 @@ communities_dropdown_field = html.Div(
             children=[
                 dcc.Dropdown(
                     id="communities-dropdown",
-                    options=[{"label": community[0], "value": index} for index, community in luts.communities.iterrows()],
-                    value=45, # yellowknife
+                    options=[
+                        {"label": community[0], "value": index}
+                        for index, community in luts.communities.iterrows()
+                    ],
+                    value=45,  # yellowknife
                 )
             ],
         ),
     ],
 )
 
-scenarios_checkbox_field = html.Div(
-    className="field",
-    children=[
-        html.Label("Scenarios (RCPs/ECPs)", className="label"),
-        dcc.Checklist(
-            labelClassName="checkbox",
-            className="control",
-            id="scenario-check",
-            options=list(
-                map(
-                    lambda k: {"label": luts.scenarios_lut[k], "value": k},
-                    luts.scenarios_lut,
-                )
-            ),
-            value=["rcp60", "rcp85"],
+scenarios_checkbox_field = wrap_in_field(
+    "Scenarios (RCPs/ECPs)",
+    dcc.Checklist(
+        labelClassName="checkbox",
+        className="control",
+        id="scenario-check",
+        options=list(
+            map(
+                lambda k: {"label": luts.scenarios_lut[k], "value": k},
+                luts.scenarios_lut,
+            )
         ),
-    ],
+        value=["rcp60", "rcp85"],
+    ),
 )
 
-variable_toggle_field = html.Div(
-    className="field",
-    children=[
-        html.Label("Variable", className="label"),
-        dcc.RadioItems(
-            labelClassName="radio",
-            className="control",
-            id="variable-toggle",
-            options=list(
-                map(
-                    lambda k: {"label": luts.variables_lut[k], "value": k},
-                    luts.variables_lut,
-                )
-            ),
-            value="tas",
+variable_toggle_field = wrap_in_field(
+    "Variable",
+    dcc.RadioItems(
+        labelClassName="radio",
+        className="control",
+        id="variable-toggle",
+        options=list(
+            map(
+                lambda k: {"label": luts.variables_lut[k], "value": k},
+                luts.variables_lut,
+            )
         ),
-    ],
+        value="tas",
+    ),
 )
 
+# Not quite the ideal Bulma structure, but it's functional.
 months_field = html.Div(
     className="field",
     children=[
@@ -186,21 +184,16 @@ months_field = html.Div(
     ],
 )
 
-models_field = html.Div(
-    className="field",
-    children=[
-        html.Label("Models(s)", className="label"),
-        dcc.Dropdown(
-            id="model-dropdown",
-            options=list(
-                map(
-                    lambda k: {"label": luts.models_lut[k], "value": k}, luts.models_lut
-                )
-            ),
-            value=["NCAR-CCSM4"],
-            multi=True,
+models_field = wrap_in_field(
+    "Model(s)",
+    dcc.Dropdown(
+        id="model-dropdown",
+        options=list(
+            map(lambda k: {"label": luts.models_lut[k], "value": k}, luts.models_lut)
         ),
-    ],
+        value=["NCAR-CCSM4"],
+        multi=True,
+    ),
 )
 
 form_fields = html.Div(
@@ -229,67 +222,63 @@ form_fields = html.Div(
     ],
 )
 
-main_layout = html.Div(
-    className="container",
-    children=[
-        html.Div(
-            className="section section--form",
-            children=[
-                form_fields,
-            ],
-        ),
-        html.Div(
-            className="section graph",
-            children=[
-                dcc.Graph(
-                    id="my-graph",
-                    config={
-                        "toImageButtonOptions": {
-                            "title": "Export to PNG",
-                            "format": "png",
-                            "filename": "CommunityChart",
-                            "height": 600,
-                            "width": 1600,
-                            "scale": 1,
+main_layout = wrap_in_section(
+    html.Div(
+        children=[
+            html.Div(
+                className="section section--form",
+                children=[
+                    form_fields,
+                ],
+            ),
+            html.Div(
+                className="graph",
+                children=[
+                    dcc.Graph(
+                        id="my-graph",
+                        config={
+                            "toImageButtonOptions": {
+                                "title": "Export to PNG",
+                                "format": "png",
+                                "filename": "CommunityChart",
+                                "height": 600,
+                                "width": 1600,
+                                "scale": 1,
+                            },
+                            "modeBarButtonsToRemove": [
+                                "zoom2d",
+                                "sendToCloud",
+                                "pan2d",
+                                "select2d",
+                                "lasso2d",
+                                "toggleSpikeLines",
+                            ],
                         },
-                        "modeBarButtonsToRemove": [
-                            "zoom2d",
-                            "sendToCloud",
-                            "pan2d",
-                            "select2d",
-                            "lasso2d",
-                            "toggleSpikeLines",
+                    ),
+                    html.Div(
+                        className="form date-range-selector",
+                        children=[
+                            html.Label("Date range", className="label"),
+                            dcc.RangeSlider(
+                                className="control",
+                                id="range-slider",
+                                marks={i: i for i in range(2000, 2320, 20)},
+                                min=2000,
+                                max=2300,
+                                step=20,
+                                value=[2000, 2300],
+                            ),
                         ],
-                    },
-                ),
-                html.Div(
-                    className="form date-range-selector",
-                    children=[
-                        html.Label("Date range", className="label"),
-                        dcc.RangeSlider(
-                            className="control",
-                            id="range-slider",
-                            marks={i: i for i in range(2000, 2320, 20)},
-                            min=2000,
-                            max=2300,
-                            step=20,
-                            value=[2000, 2300],
-                        ),
-                    ],
-                ),
-            ],
-        ),
-    ],
+                    ),
+                ],
+            ),
+        ],
+    )
 )
 
-help_text = html.Div(
-    className="container",
-    children=[
-        html.Div(
-            className="section",
-            children=[
-                dcc.Markdown(
-                    """
+help_text = wrap_in_section(
+    dcc.Markdown(
+        """
 
 ## Climate scenarios
 
@@ -309,11 +298,8 @@ These scenarios allow extensions of RCPs for 2100–2300 by expanding the data s
 
 
                 """,
-                    className="is-size-5 content",
-                )
-            ],
-        )
-    ],
+    ),
+    container_classes="is-size-5 content",
 )
 
 layout = html.Div(children=[header, main_layout, help_text, footer])

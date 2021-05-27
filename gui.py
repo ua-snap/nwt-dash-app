@@ -1,5 +1,5 @@
 """
-NWT Mine site future climate tool
+NWT Climate Explorer
 """
 # pylint: disable=invalid-name, import-error, line-too-long, too-many-arguments
 from datetime import datetime
@@ -113,7 +113,7 @@ communities_dropdown_field = html.Div(
                         {"label": community[0], "value": index}
                         for index, community in luts.communities.iterrows()
                     ],
-                    value=45,  # yellowknife
+                    value=[45],  # yellowknife
                 )
             ],
         ),

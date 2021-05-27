@@ -1,5 +1,5 @@
 """
-NWT Mine site future climate tool
+NWT Climate Explorer
 """
 # pylint: disable=invalid-name, import-error, line-too-long, too-many-arguments
 import os
@@ -178,18 +178,19 @@ def update_graph(
     # TBD: Handle case when no community is selected,
     # Or other variables are missing such that the
     # graph is blank??
-    if (
-        not community
-        or not scenario_values
-        or not model_values
-        or (not months and not all_check)
-    ):
-        print(community, scenario_values, model_values, months, all_check)
-        return None
+    # if (
+    #     not community
+    #     or not scenario_values
+    #     or not model_values
+    #     or (not months and not all_check)
+    # ):
+    
+        #return (45, 'rcp60', '5ModelAvg', all_check, 'tas')
 
     # Subset community, scenarios, and models
     community_ix = community
-    community = communities.iloc[community].name 
+    community = communities.iloc[community].name
+
     selected = data[data.community.isin([community])]
     selected = selected[selected.scenario.isin(scenario_values)]
     selected = selected[selected.model.isin(model_values)]

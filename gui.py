@@ -46,16 +46,12 @@ def wrap_in_field(label, control, className=""):
 
 map_figure = go.Figure(data=luts.places_trace, layout=luts.map_layout)
 
-# We want this HTML structure to get the full-width background color:
-# <div class="header">
-#   <div class="container"> gives us the centered column
-#     <div class="section"> a bit more padding to stay consistent with form
 header = ddsih.DangerouslySetInnerHTML(
     f"""
 <header>
     <div class="container">
         <div class="titles">
-            <h1 class="title is-1">Northwest Territories Climate Explorer</h1>
+            <h1 class="title is-1">Northwest Territories<br> Climate Explorer</h1>
             <h2 class="subtitle is-2">See climate projections for NWT locations under different scenarios</h2>
         </div>
     </div>

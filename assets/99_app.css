@@ -1,12 +1,10 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin-ext');
-@import url('https://fonts.googleapis.com/css?family=Cardo:400,400i,700&subset=latin-ext');
-
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Sigmar+One&display=swap');
 html, body {
-	font-family: 'Cardo';
+	font-family: 'Lato', serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-family: 'Open Sans';
+	font-family: 'Lato', sans-serif;
 }
 
 .camera-icon span {
@@ -38,13 +36,26 @@ label.label:not(:last-child) {
 }
 
 header {
-	height: 500px;
-	padding-top: 2.5rem;
-	background: url("./yellowknife.jpg") 25%;
+	height: 700px;
+	padding-top: 2rem;
+	background-image: url("./nwt_header_bob-wilson_baselayer.jpg");
+	background-size: cover;
 }
 
 header .titles {
-	text-shadow: 0 0 8px rgba(0, 0, 0, 1), 0 0 8px rgba(255, 255, 255, 1);
+	text-shadow: -2px 2px 3px rgba(0, 0, 0, 0.5);
+	text-align: center;
+}
+
+.titles h1.title.is-1 {
+	font-size:  4rem;
+	line-height:  90%;
+	font-family: "Sigmar One";
+}
+
+.titles h2.is-2 {
+	font-size:  1.75rem;
+	padding-top: 0.5rem;
 }
 
 .titles h1, .titles h2 {

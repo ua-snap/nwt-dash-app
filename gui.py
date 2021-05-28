@@ -85,10 +85,11 @@ footer = ddsih.DangerouslySetInnerHTML(
                 </a>
             </div>
             <div class="column content is-size-5">
-                <p>This tool is part of an ongoing collaboration between SNAP and the Government of Northwest Territories. We are working to make a wide range of downscaled climate products that are easily accessible, flexibly usable, and fully interpreted and understandable to users in the Northwest Territories, while making these products relevant at a broad geographic scale.
+                <p>This tool is part of an ongoing collaboration between the Scenarios Network for Alaska + Arctic Planning and the Government of Northwest Territories. We are working to make a wide range of downscaled climate products that are easily accessible, flexibly usable, and fully interpreted and understandable to users in the Northwest Territories, while making these products relevant at a broad geographic scale.
                 </p>
                 <p>Copyright &copy; {current_year} University of Alaska Fairbanks.  All rights reserved.</p>
                 <p>UA is an AA/EO employer and educational institution and prohibits illegal discrimination against any individual.  <a href="https://www.alaska.edu/nondiscrimination/">Statement of Nondiscrimination</a> and <a href="https://www.alaska.edu/records/records/compliance/gdpr/ua-privacy-statement/">Privacy Statement</a>.</p>
+                <p>Photo &copy; Robert Wilson Photography</p>
             </div>
         </div>
     </div>

@@ -12,6 +12,7 @@ import pandas as pd
 import luts
 from gui import layout
 
+
 # Read pickled data blobs and other items used from env
 data = pd.read_pickle("data.pickle")
 communities = pd.read_pickle("community_places.pickle")
@@ -175,17 +176,6 @@ def update_graph(
     variable_value,
 ):
     """ Update graph from UI controls """
-    # TBD: Handle case when no community is selected,
-    # Or other variables are missing such that the
-    # graph is blank??
-    # if (
-    #     not community
-    #     or not scenario_values
-    #     or not model_values
-    #     or (not months and not all_check)
-    # ):
-    
-        #return (45, 'rcp60', '5ModelAvg', all_check, 'tas')
 
     # Subset community, scenarios, and models
     community_ix = community

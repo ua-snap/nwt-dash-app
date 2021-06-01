@@ -2,11 +2,11 @@
 Take melted data and produce a binary pickle to be use by the Dash app.
 """
 # pylint: disable=invalid-name, import-error
-
 import os
 from collections import defaultdict
 import pickle
 import pandas as pd
+
 
 files = [
     'data/tas_pr_nwt_decadal_mean_historical_melted.csv',

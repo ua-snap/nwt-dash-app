@@ -51,7 +51,6 @@ models_lut = {
 
 
 # LINE COLORS LOOKUP -- hacky but somewhat working
-# TODO maybe remove this totally -- the auto values may be better?
 ms_colors = {
     "GISS-E2-R": {"rcp45": "#FDD017", "rcp60": "#F2BB66", "rcp85": "#EAC117"},
     "GFDL-CM3": {"rcp45": "#6AA121", "rcp60": "#347C17", "rcp85": "#254117"},
@@ -61,47 +60,12 @@ ms_colors = {
     "NCAR-CCSM4": {"rcp45": "#C35817", "rcp60": "#6F4E37", "rcp85": "#493D26"},
 }
 
-# from luts import scenarios_lut, variables_lut, months_lut, models_lut
-
 communities = pd.read_pickle("community_places.pickle")
 communities = communities.reset_index()
 communities = communities.rename(columns={"index": "name"})
 
 mapbox_access_token = os.environ["MAPBOX_ACCESS_TOKEN"]
-# OLD
-# map_communities_trace = go.Scattermapbox(
-#     lat=communities.loc[:, "latitude"],
-#     lon=communities.loc[:, "longitude"],
-#     mode="markers",
-#     marker={"size": 15, "color": "rgb(80,80,80)"},
-#     line={"color": "rgb(0, 0, 0)", "width": 2},
-#     text=communities.index,
-#     hoverinfo="text",
-# )
 
-# map_layout = go.Layout(
-#     autosize=True,
-#     hovermode="closest",
-#     mapbox=dict(
-#         accesstoken=mapbox_access_token,
-#         zoom=3,
-#         center=dict(lat=68, lon=-120),
-#         layers=[
-#             dict(
-#                 sourcetype="geojson",
-#                 source=json.loads(
-#                     open("./NorthwestTerritories_4326.geojson", "r").read()
-#                 ),
-#                 type="fill",
-#                 color="rgba(255,255,255,.1)",
-#             )
-#         ],
-#     ),
-#     showlegend=False,
-#     margin=dict(l=0, r=0, t=0, b=0),
-# )
-
-# NEW
 # This trace is shared so we can highlight specific communities.
 places_trace = go.Scattermapbox(
     lat=communities.loc[:, "latitude"],

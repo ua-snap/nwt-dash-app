@@ -87,6 +87,7 @@ footer = ddsih.DangerouslySetInnerHTML(
             <div class="column content is-size-5">
                 <p>This tool is part of an ongoing collaboration between the <a href="https://uaf-snap.org">Scenarios Network for Alaska + Arctic Planning</a> and the Government of Northwest Territories. We are working to make a wide range of downscaled climate products that are easily accessible, flexibly usable, and fully interpreted and understandable to users in the Northwest Territories, while making these products relevant at a broad geographic scale.
                 </p>
+                <p>Please contact uaf-snap-data-tools@alaska.edu if you have questions or would like to provide feedback for this tool.</p>
                 <p>Copyright &copy; {current_year} University of Alaska Fairbanks.  All rights reserved.</p>
                 <p>UA is an AA/EO employer and educational institution and prohibits illegal discrimination against any individual.  <a href="https://www.alaska.edu/nondiscrimination/">Statement of Nondiscrimination</a> and <a href="https://www.alaska.edu/records/records/compliance/gdpr/ua-privacy-statement/">Privacy Statement</a>.</p>
                 <p>Photo &copy; Robert Wilson Photography</p>

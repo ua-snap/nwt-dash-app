@@ -1,12 +1,20 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin-ext');
-@import url('https://fonts.googleapis.com/css?family=Cardo:400,400i,700&subset=latin-ext');
-
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Sigmar+One&display=swap');
 html, body {
-	font-family: 'Cardo';
+	font-family: 'Lato', serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-family: 'Open Sans';
+	font-family: 'Lato', sans-serif;
+}
+
+.camera-icon span {
+    display: inline-block;
+    position: relative;
+    top: 0.25rem;
+    padding: 0 3px;
+}
+.camera-icon span path {
+    fill: #ccc;
 }
 
 label.label:not(:last-child) {
@@ -27,32 +35,35 @@ label.label:not(:last-child) {
 	display: block;
 }
 
-.header {
-	background-color: rgba(239, 241, 226, 1.00);
-	padding: 0;
+header {
+	height: 700px;
+	padding-top: 2rem;
+	background-image: url("./nwt_header_bob-wilson_baselayer.jpg");
+	background-size: cover;
 }
 
-.header--section {
-	margin-top: -1rem;
+header .titles {
+	text-shadow: -2px 2px 3px rgba(0, 0, 0, 0.5);
+	text-align: center;
 }
 
-.header--section h1 {
-	padding-top: .8rem;
+.titles h1.title.is-1 {
+	font-size:  4rem;
+	line-height:  90%;
+	font-family: "Sigmar One";
 }
 
-.header--logo {
-	float: left;
-	padding-right: 2rem;
+.titles h2.is-2 {
+	font-size:  1.75rem;
+	padding-top: 0.5rem;
 }
 
-.header--snap-link a {
-	height: 5.4em;
-	display: block;
-	z-index: 1000;
+.titles h1, .titles h2 {
+	color: #fff;
 }
 
-.header--snap-link img {
-	height: 5.4em;
+.container.content {
+	width: 50rem;
 }
 
 .form label, .form input {
@@ -65,36 +76,18 @@ label.checkbox input, label.radio input {
 	margin-right: .5ex;
 }
 
-tspan.line:nth-child(1) {
-	font-weight: 900;
-	font-size: 18pt;
+footer {
+	box-shadow: inset 0 7px 9px -7px rgba(0,0,0,0.4);
 }
 
-.date-range-selector .rc-slider {
-	margin: 2rem 1rem;
+footer .logos.column {
+	text-align: right;
 }
-
-.rc-slider-handle {
-	width: 25px;
-	height: 25px;
-	margin-left: -15px;
-	margin-top: -11px;
-}
-
-.footer p {
-	width: 50%;
-	margin: 1em auto;
-}
-
-.footer a {
+footer .logos.column a img {
+	max-width: 90%;
 	display: inline-block;
+	margin-bottom: 1rem;
 }
-
-.footer a img {
-	height: 5em;
-	margin: 1em 1.5em;
-}
-
-._dash-undo-redo {
-	display: none;
+footer p {
+	width: 90%;
 }

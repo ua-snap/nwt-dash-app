@@ -9,7 +9,6 @@ To run the application locally, install [pipenv](https://pipenv.readthedocs.io/e
 ```bash
 cd /path/to/this/repo
 pipenv install
-export GTAG_ID='abc' # google analytics ID, nonce for dev
 export REQUESTS_PATHNAME_PREFIX='/' # see below for more info
 export MAPBOX_ACCESS_TOKEN='' # <-- insert a valid mapbox token here
 pipenv run python application.py
@@ -27,8 +26,10 @@ pipenv run pip freeze > requirements.txt
 git commit -am'updating requirements.txt'
 ```
 
-When deploying on AWS Elastic Beanstalk, a few environment variables must be set:
+When deploying on AWS Elastic Beanstalk, a few environment variables must be set (use `eb setenv`):
 
  * `MAPBOX_ACCESS_TOKEN`: token for API access for Mapbox, no default value
- * `GTAG_ID`: property ID for Google Analytics, no default value
  * `REQUESTS_PATHNAME_PREFIX`: Path prefix on host, should be `/` for local development and `/tools/nwt-climate-explorer/` for current deploy on AWS
+ * e.g. `eb setenv REQUESTS_PATHNAME_PREFIX=/`
+ * `eb printenv` displays the current environment variables
+ * then `eb deploy` to spin up an instance and `eb open` to will open the URL (temporary or otherwise) in your browser.

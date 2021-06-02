@@ -26,10 +26,12 @@ pipenv run pip freeze > requirements.txt
 git commit -am'updating requirements.txt'
 ```
 
-When deploying on AWS Elastic Beanstalk, a few environment variables must be set (use `eb setenv`):
+When deploying on AWS Elastic Beanstalk, a few environment variables must be set using `eb setenv`:
 
- * `MAPBOX_ACCESS_TOKEN`: token for API access for Mapbox, no default value
- * `REQUESTS_PATHNAME_PREFIX`: Path prefix on host, should be `/` for local development and `/tools/nwt-climate-explorer/` for current deploy on AWS
- * e.g. `eb setenv REQUESTS_PATHNAME_PREFIX=/`
- * `eb printenv` displays the current environment variables
- * then `eb deploy` to spin up an instance and `eb open` to will open the URL (temporary or otherwise) in your browser.
+ * `MAPBOX_ACCESS_TOKEN`: token for API access for Mapbox, no default value.
+ * `REQUESTS_PATHNAME_PREFIX`: Path prefix on host, should be `/` for local development and `/tools/nwt-climate-explorer/` for current deploy on AWS.
+ * `DASH_REQUESTS_PATHNAME_PREFIX`: URL for file requests, must start and end with `/`. Should be `/tools/nwt-climate-explorer/` for current deploy on AWS.
+ * `eb printenv` displays the current environment variables.
+ * `eb deploy` deploys the source bundle from the initialized project directory to the running application (e.g. `bob-nwt-dash-app-dev`).
+ * `eb open` will open the URL in your browser.
+

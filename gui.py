@@ -49,6 +49,7 @@ map_figure = go.Figure(data=luts.places_trace, layout=luts.map_layout)
 
 header = ddsih.DangerouslySetInnerHTML(
     f"""
+<div class="bannerstrip">University of Alaska Fairbanks&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;Scenarios Network for Alaska + Arctic Planning</div>
 <header>
     <div class="container">
         <div class="titles">

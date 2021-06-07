@@ -42,6 +42,16 @@ header {
 	background-size: cover;
 }
 
+.bannerstrip {
+	background-color:  white;
+	color: #000;
+	text-transform: uppercase;
+	text-align:  center;
+	letter-spacing:  3px;
+	font-size:  9pt;
+	padding:  9px 0 7px;
+}
+
 header .titles {
 	text-shadow: -2px 2px 3px rgba(0, 0, 0, 0.5);
 	text-align: center;

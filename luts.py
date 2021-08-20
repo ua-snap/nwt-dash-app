@@ -6,8 +6,8 @@ import pandas as pd
 
 # The next config sets a relative base path so we can deploy
 # with custom URLs.
-if os.environ.get("REQUESTS_PATHNAME_PREFIX"):
-    path_prefix = os.getenv("REQUESTS_PATHNAME_PREFIX")
+if os.environ.get("DASH_REQUESTS_PATHNAME_PREFIX"):
+    path_prefix = os.getenv("DASH_REQUESTS_PATHNAME_PREFIX")
 else:
     path_prefix = "/"
 

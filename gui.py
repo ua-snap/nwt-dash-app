@@ -4,8 +4,7 @@ NWT Climate Explorer
 # pylint: disable=invalid-name, import-error, line-too-long, too-many-arguments
 from datetime import datetime
 import plotly.graph_objs as go
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc, html
 import dash_dangerously_set_inner_html as ddsih
 import luts
 

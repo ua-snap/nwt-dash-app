@@ -305,6 +305,9 @@ The RCP values 4.5, 6.0, and 8.5 indicate projected radiative forcing values—t
 
 These scenarios allow extensions of RCPs for 2100–2300 by expanding the data series for greenhouse gas and land use. ECPs are intended to provide rough estimations of what climate and ocean systems might look like in a few centuries regardless of the driving forces of emissions (demography, policies, technology, and investment).
 
+### Source data
+
+Source data used in this tool can be downloaded [here](https://catalog.snap.uaf.edu/geonetwork/srv/eng/catalog.search#/metadata/815c6708-b6cf-4a46-b5c8-344851063117).
 
                 """,
     ),

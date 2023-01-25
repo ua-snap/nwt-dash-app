@@ -11,9 +11,6 @@ if os.environ.get("DASH_REQUESTS_PATHNAME_PREFIX"):
 else:
     path_prefix = "/"
 
-# Google analytics tag
-gtag_id = "UA-3978613-12"
-
 # Lookup tables for a few things used in form inputs & graph title
 variables_lut = {"tas": "Temperature", "pr": "Precipitation"}
 

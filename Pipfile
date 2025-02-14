@@ -8,6 +8,7 @@ plotly = "*"
 dash = "*"
 pandas = "*"
 dash-dangerously-set-inner-html = "*"
+typing-extensions = "*"
 
 [dev-packages]
 

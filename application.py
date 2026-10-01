@@ -2,7 +2,6 @@
 NWT Climate Explorer
 """
 # pylint: disable=invalid-name, import-error, line-too-long, too-many-arguments
-import os
 import json
 import itertools
 import plotly.graph_objs as go
@@ -16,7 +15,6 @@ from gui import layout
 # Read pickled data blobs and other items used from env
 data = pd.read_pickle("data.pickle")
 communities = pd.read_pickle("community_places.pickle")
-mapbox_access_token = os.environ["MAPBOX_ACCESS_TOKEN"]
 
 app = dash.Dash(__name__)
 

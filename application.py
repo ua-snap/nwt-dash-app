@@ -235,7 +235,7 @@ def update_graph(
         ],
         "layout": {
             "title": title,
-            "autosize": False,
+            "autosize": True,
             "showlegend": True,
             "height": 650,
             "margin": dict(t=100, b=130),

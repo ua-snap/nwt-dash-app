@@ -10,10 +10,11 @@ To run the application locally, install [pipenv](https://pipenv.readthedocs.io/e
 cd /path/to/this/repo
 pipenv install
 export REQUESTS_PATHNAME_PREFIX='/' # see below for more info
+export CARTO_API_KEY='<your CARTO basemaps API key>'
 pipenv run python application.py
 ```
 
-The application will be available at [http://127.0.0.1:8080/](http://127.0.0.1:8080/).
+The application will be available at [http://127.0.0.1:8080/](http://127.0.0.1:8080/). The map's basemap requires a valid [CARTO basemaps API key](https://carto.com/basemaps/apikey) set via the `CARTO_API_KEY` environment variable.
 
 ## Deployment on AWS
 
@@ -27,6 +28,7 @@ git commit -am'updating requirements.txt'
 
 When deploying on AWS Elastic Beanstalk, a few environment variables must be set using `eb setenv`:
 
+ * `CARTO_API_KEY`: API key for CARTO basemaps. Without it, the map's basemap will fail to load.
  * `REQUESTS_PATHNAME_PREFIX`: Path prefix on host, should be `/` for local development and `/tools/nwt-climate-explorer/` for current deploy on AWS.
  * `DASH_REQUESTS_PATHNAME_PREFIX`: URL for file requests, must start and end with `/`. Should be `/tools/nwt-climate-explorer/` for current deploy on AWS.
  * `eb printenv` displays the current environment variables.

@@ -72,10 +72,27 @@ places_trace = go.Scattermapbox(
     hoverinfo="text",
 )
 
+carto_api_key = os.getenv("CARTO_API_KEY", "")
+
 map_layout = go.Layout(
     autosize=True,
     hovermode="closest",
-    mapbox=dict(style="carto-positron", zoom=3.25, center=dict(lat=66.75, lon=-125)),
+    mapbox=dict(
+        style="white-bg",
+        layers=[
+            dict(
+                below="traces",
+                sourcetype="raster",
+                source=[
+                    "https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key="
+                    + carto_api_key
+                ],
+                sourceattribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
+            )
+        ],
+        zoom=3.25,
+        center=dict(lat=66.75, lon=-125),
+    ),
     showlegend=False,
     margin=dict(l=0, r=0, t=0, b=0),
 )

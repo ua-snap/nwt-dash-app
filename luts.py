@@ -61,8 +61,6 @@ communities = pd.read_pickle("community_places.pickle")
 communities = communities.reset_index()
 communities = communities.rename(columns={"index": "name"})
 
-mapbox_access_token = os.environ["MAPBOX_ACCESS_TOKEN"]
-
 # This trace is shared so we can highlight specific communities.
 places_trace = go.Scattermapbox(
     lat=communities.loc[:, "latitude"],
